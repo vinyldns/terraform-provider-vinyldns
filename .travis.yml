@@ -3,6 +3,9 @@ language: go
 go:
   - 1.10.3
 
+services:
+  - docker
+
 script:
   - make start-api
   - make test
