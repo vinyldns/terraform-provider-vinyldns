@@ -1,0 +1,29 @@
+<% wrap_layout :inner do %>
+  <% content_for :sidebar do %>
+    <div class="docs-sidebar hidden-print affix-top" role="complementary">
+      <ul class="nav docs-sidenav">
+        <li<%= sidebar_current("docs-home") %>>
+          <a href="/docs/providers/index.html">All Providers</a>
+        </li>
+        <li<%= sidebar_current("docs-vinyldns-index") %>>
+          <a href="/docs/providers/vinyldns/index.html">VinylDNS Provider</a>
+        </li>
+        <li<%= sidebar_current("docs-vinyldns-resource") %>>
+          <a href="#">Resources</a>
+          <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-vinyldns-group") %>>
+              <a href="/docs/providers/vinyldns/r/group.html">vinyldns_group</a>
+            </li>
+            <li<%= sidebar_current("docs-vinyldns-zone") %>>
+              <a href="/docs/providers/vinyldns/r/zone.html">vinyldns_zone</a>
+            </li>
+            <li<%= sidebar_current("docs-vinyldns-record-set") %>>
+              <a href="/docs/providers/vinyldns/r/record_set.html">vinyldns_record_set</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  <% end %>
+  <%= yield %>
+<% end %>
