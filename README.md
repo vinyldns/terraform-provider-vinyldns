@@ -45,13 +45,25 @@ To run a local VinylDNS API, you'll need to:
 ```
 git clone git@github.com:vinyldns/vinyldns.git
 cd vinyldns
-bin/docker-up-api-server.sh
+bin/docker-up-vinyldns.sh
+```
+
+Note that a `make` convenience task handles this:
+
+```
+make start-api
 ```
 
 Then, to run the `terraform-provider-vinyldns` acceptance tests against the local Dockerized VinylDNS API server:
 
 ```
 make test
+```
+
+To stop the `localhost:9000` VinylDNS:
+
+```
+make stop-api
 ```
 
 ## Building

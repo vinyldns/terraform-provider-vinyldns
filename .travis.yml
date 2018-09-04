@@ -1,0 +1,13 @@
+language: go
+
+go:
+  - 1.10.3
+
+script:
+  - make start-api
+  - make test
+  - make build
+
+notifications:
+  email:
+    on_success: never

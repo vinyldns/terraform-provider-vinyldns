@@ -1,6 +1,7 @@
 PKG_NAME=vinyldns
 NAME=terraform-provider-vinyldns
 WEBSITE_REPO=github.com/hashicorp/terraform-website
+VINYLDNS_REPO=github.com/vinyldns/vinyldns
 SOURCE=./...
 VERSION=0.8.0
 
@@ -11,6 +12,16 @@ updatedeps:
 	go get -u golang.org/x/tools/cmd/cover
 	go get -u github.com/mitchellh/gox
 	dep ensure
+
+start-api:
+	if [ ! -d "$(GOPATH)/src/$(VINYLDNS_REPO)" ]; then \
+		echo "$(VINYLDNS_REPO) not found in your GOPATH (necessary for acceptance tests), getting..."; \
+		git clone https://$(VINYLDNS_REPO) $(GOPATH)/src/$(VINYLDNS_REPO); \
+	fi
+	$(GOPATH)/src/$(VINYLDNS_REPO)/bin/docker-up-vinyldns.sh
+
+stop-api:
+	./../vinyldns/bin/remove-vinyl-containers.sh
 
 # NOTE: acceptance tests assume a VinylDNS instance is running on localhost:9000 using the
 # technique here: https://github.com/vinyldns/vinyldns/blob/master/bin/docker-up-vinyldns.sh
@@ -47,8 +58,6 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: updatedeps test cover install build version website website-test
-
 package: build
 	rm -rf release
 	mkdir release
@@ -71,3 +80,5 @@ release: package
 		--tag ${VERSION} \
 		--name FILE \
 		--file FILE
+
+.PHONY: updatedeps run-api stop-api test cover install build version website website-test
