@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/vinyldns/terraform-provider-vinyldns.svg?branch=master)](https://travis-ci.org/vinyldns/terraform-provider-vinyldns)
+
 # terraform-provider-vinyldns
 
 A [Terraform](https://terraform.io) provider for the [VinylDNS](https://github.com/vinyldns/vinyldns) DNS as a service API.
