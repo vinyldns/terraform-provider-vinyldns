@@ -26,15 +26,17 @@ providers {
 
 Alternatively, you can install from source:
 
-* install Golang (1.10 currently required)
-* establish your `$GOPATH`
-* clone `vinyldns/terraform-provider-vinyldns` to `/$GOPATH/src/github.com/vinyldns/terraform-provider-vinyldns`
-* `cd /$GOPATH/github.com/vinyldns/terraform-provider-vinyldns && make`
-* Add the following to your `~/.terraformrc`:
+```
+go get github.com/vinyldns/terraform-provider-vinyldns
+cd $GOPATH/src/github.com/vinyldns/terraform-provider-vinyldns
+make install
+```
+
+Add `terraform-provider-vinyldns` to your `~/.terraformrc`:
 
 ```
 providers {
-  "vinyldns" = "path/to/your/terraform-provider-vinyldns"
+  "vinyldns" = "your-gopath/bin/terraform-provider-vinyldns"
 }
 ```
 

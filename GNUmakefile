@@ -36,8 +36,8 @@ cover:
 	go tool cover -html=coverage.out
 	rm coverage.out
 
-install:
-	dep ensure
+install: deps
+	go install
 
 build:
 	export CGO_ENABLED=0; gox -ldflags "-X main.version=${VERSION}" -os "linux darwin windows" -arch "386 amd64" -output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns"
