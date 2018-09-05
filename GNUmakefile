@@ -5,9 +5,9 @@ VINYLDNS_REPO=github.com/vinyldns/vinyldns
 SOURCE=./...
 VERSION=0.8.0
 
-all: updatedeps test install
+all: deps start-api test build stop-api
 
-updatedeps:
+deps:
 	go get -u github.com/golang/dep/cmd/dep
 	go get -u golang.org/x/tools/cmd/cover
 	go get -u github.com/mitchellh/gox
@@ -25,6 +25,7 @@ stop-api:
 
 # NOTE: acceptance tests assume a VinylDNS instance is running on localhost:9000 using the
 # technique here: https://github.com/vinyldns/vinyldns/blob/master/bin/docker-up-vinyldns.sh
+# See `start-api` for a convenience task in doing so.
 test:
 	go vet
 	go test -cover
@@ -38,7 +39,7 @@ cover:
 install:
 	dep ensure
 
-build: updatedeps
+build:
 	export CGO_ENABLED=0; gox -ldflags "-X main.version=${VERSION}" -os "linux darwin windows" -arch "386 amd64" -output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns"
 
 version:
@@ -81,4 +82,4 @@ release: package
 		--name FILE \
 		--file FILE
 
-.PHONY: updatedeps run-api stop-api test cover install build version website website-test
+.PHONY: deps run-api stop-api test cover install build version website website-test

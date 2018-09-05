@@ -7,9 +7,7 @@ services:
   - docker
 
 script:
-  - make start-api
-  - make test
-  - make build
+  - make
 
 notifications:
   email:
