@@ -6,6 +6,7 @@ SOURCE=./...
 VERSION=0.8.0
 
 all: deps start-api test build stop-api
+deps-build: deps build
 
 deps:
 	go get -u github.com/golang/dep/cmd/dep
