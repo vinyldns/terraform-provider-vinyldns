@@ -80,10 +80,15 @@ make build
 
 ### Building in Docker
 
-The project contains a `docker-compose.yml`/`Dockerfile` that will perform a test build in a empty container. To run:
+The project contains a `docker-compose.yml`/`Dockerfile` that will perform a test build in a empty container. To run on windows:
 
+```bash
+docker-compose up --force-recreate --build builder
+docker-compose down
 ```
-docker-compose build
+or on Mac or Linux (preferred):
+```bash
+./build.sh
 ```
 
 ## Upgrading Dependencies
