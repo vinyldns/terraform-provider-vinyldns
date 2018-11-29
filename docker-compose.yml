@@ -1,4 +1,4 @@
-build:
+builder:
   build: .
   volumes:
     - ./build:/go/src/github.com/vinyldns/terraform-provider-vinyldns/build
