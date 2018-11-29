@@ -3,7 +3,7 @@ NAME=terraform-provider-vinyldns
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 VINYLDNS_REPO=github.com/vinyldns/vinyldns
 SOURCE=./...
-VERSION=0.8.0
+VERSION=0.8.1
 
 all: deps start-api test build stop-api
 
@@ -18,7 +18,7 @@ start-api:
 		echo "$(VINYLDNS_REPO) not found in your GOPATH (necessary for acceptance tests), getting..."; \
 		git clone https://$(VINYLDNS_REPO) $(GOPATH)/src/$(VINYLDNS_REPO); \
 	fi
-	$(GOPATH)/src/$(VINYLDNS_REPO)/bin/docker-up-vinyldns.sh
+	$(GOPATH)/src/$(VINYLDNS_REPO)/bin/docker-up-vinyldns.sh --api-only
 
 stop-api:
 	./../vinyldns/bin/remove-vinyl-containers.sh
