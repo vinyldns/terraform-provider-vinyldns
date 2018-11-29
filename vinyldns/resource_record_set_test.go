@@ -169,7 +169,7 @@ resource "vinyldns_record_set" "test_nsd_record_set" {
 	zone_id = "${vinyldns_zone.test_zone.id}"
 	type = "NS"
 	ttl = 6000
-	record_nsdname = "foo"
+	record_nsdnames = ["ns1.parent.com."]
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]

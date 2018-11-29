@@ -49,9 +49,13 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
-			"record_nsdname": &schema.Schema{
-				Type:     schema.TypeString,
+			"record_nsdnames": &schema.Schema{
+				Type:     schema.TypeSet,
 				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set: func(v interface{}) int {
+					return hashcode.String(v.(string))
+				},
 			},
 			"record_cname": &schema.Schema{
 				Type:     schema.TypeString,
@@ -152,6 +156,11 @@ func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) e
 func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 	recordType := d.Get("type").(string)
 
+	// SOA records are currently read-only and cannot be created, updated or deleted by vinyldns
+	if recordType == "SOA" {
+		return []vinyldns.Record{}, errors.New(recordType + " records are not currently supported by vinyldns")
+	}
+
 	if recordType == "CNAME" {
 		cname := d.Get("record_cname").(string)
 
@@ -166,25 +175,16 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 		}, nil
 	}
 
-	// SOA records are currently read-only and cannot be created, updated or deleted by vinyldns
-	if recordType == "SOA" {
-		return []vinyldns.Record{}, errors.New(recordType + " records are not currently supported by vinyldns")
-	}
-
-	if recordType == "NS" {
-		return []vinyldns.Record{
-			vinyldns.Record{
-				NSDName: d.Get("record_nsdname").(string),
-			},
-		}, nil
-	}
-
 	if recordType == "TXT" {
 		return []vinyldns.Record{
 			vinyldns.Record{
 				Text: d.Get("record_text").(string),
 			},
 		}, nil
+	}
+
+	if recordType == "NS" {
+		return nsRecordSets(stringSetToStringSlice(d.Get("record_nsdnames").(*schema.Set))), nil
 	}
 
 	return addressRecordSets(stringSetToStringSlice(d.Get("record_addresses").(*schema.Set))), nil
