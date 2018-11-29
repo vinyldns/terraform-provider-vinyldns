@@ -3,7 +3,7 @@ NAME=terraform-provider-vinyldns
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 VINYLDNS_REPO=github.com/vinyldns/vinyldns
 SOURCE=./...
-VERSION=0.8.0
+VERSION=0.8.1
 
 all: deps start-api test build stop-api
 

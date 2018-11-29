@@ -49,17 +49,10 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
-			/*
-				// NS records are not currently supported by vinyldns
-				"record_nsdnames": &schema.Schema{
-					Type:     schema.TypeSet,
-					Optional: true,
-					Elem:     &schema.Schema{Type: schema.TypeString},
-					Set: func(v interface{}) int {
-						return hashcode.String(v.(string))
-					},
-				},
-			*/
+			"record_nsdname": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"record_cname": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -173,19 +166,23 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 		}, nil
 	}
 
-	// NS and SOA records are currently read-only and cannot be created, updated or deleted by vinyldns
-	if recordType == "NS" || recordType == "SOA" {
+	// SOA records are currently read-only and cannot be created, updated or deleted by vinyldns
+	if recordType == "SOA" {
 		return []vinyldns.Record{}, errors.New(recordType + " records are not currently supported by vinyldns")
+	}
 
-		//return nsRecordSets(stringSetToStringSlice(d.Get("record_nsdnames").(*schema.Set))), nil
+	if recordType == "NS" {
+		return []vinyldns.Record{
+			vinyldns.Record{
+				NSDName: d.Get("record_nsdname").(string),
+			},
+		}, nil
 	}
 
 	if recordType == "TXT" {
-		//return txtRecordSets(d.Get("record_text").(string)), nil
-		txt := d.Get("record_text").(string)
 		return []vinyldns.Record{
 			vinyldns.Record{
-				Text: txt,
+				Text: d.Get("record_text").(string),
 			},
 		}, nil
 	}

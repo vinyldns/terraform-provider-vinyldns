@@ -162,4 +162,15 @@ resource "vinyldns_record_set" "test_txt_record_set" {
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
+}
+
+resource "vinyldns_record_set" "test_nsd_record_set" {
+	name = "nsd-terraformtestrecordset"
+	zone_id = "${vinyldns_zone.test_zone.id}"
+	type = "NS"
+	ttl = 6000
+	record_nsdname = "foo"
+	depends_on = [
+		"vinyldns_zone.test_zone"
+	]
 }`
