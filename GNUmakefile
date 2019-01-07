@@ -19,7 +19,9 @@ start-api:
 		echo "$(VINYLDNS_REPO) not found in your GOPATH (necessary for acceptance tests), getting..."; \
 		git clone https://$(VINYLDNS_REPO) $(GOPATH)/src/$(VINYLDNS_REPO); \
 	fi
-	$(GOPATH)/src/$(VINYLDNS_REPO)/bin/docker-up-vinyldns.sh --api-only
+	$(GOPATH)/src/$(VINYLDNS_REPO)/bin/docker-up-vinyldns.sh \
+		--version 0.8.0 \
+		--api-only
 
 stop-api:
 	./../vinyldns/bin/remove-vinyl-containers.sh
@@ -30,7 +32,12 @@ stop-api:
 test:
 	go vet
 	go test -cover
-	VINYLDNS_ACCESS_KEY=okAccessKey VINYLDNS_SECRET_KEY=okSecretKey VINYLDNS_HOST=http://localhost:9000 TF_LOG=DEBUG TF_ACC=1 go test ${SOURCE} -v
+	VINYLDNS_ACCESS_KEY=okAccessKey \
+		VINYLDNS_SECRET_KEY=okSecretKey \
+		VINYLDNS_HOST=http://localhost:9000 \
+		TF_LOG=DEBUG \
+		TF_ACC=1 \
+		go test ${SOURCE} -v
 
 cover:
 	go test $(TEST) -coverprofile=coverage.out
