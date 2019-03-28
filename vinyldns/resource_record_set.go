@@ -227,11 +227,11 @@ func stringSetToStringSlice(stringSet *schema.Set) []string {
 	return ret
 }
 
-func waitUntilRecordSetDeployed(d *schema.ResourceData, meta interface{}, status string) error {
+func waitUntilRecordSetDeployed(d *schema.ResourceData, meta interface{}, changeID string) error {
 	stateConf := &resource.StateChangeConf{
 		Pending:      []string{"Pending", ""},
 		Target:       []string{"Complete"},
-		Refresh:      recordSetStateRefreshFunc(d, meta, status),
+		Refresh:      recordSetStateRefreshFunc(d, meta, changeID),
 		Timeout:      30 * time.Minute,
 		Delay:        500 * time.Millisecond,
 		MinTimeout:   15 * time.Second,
@@ -242,10 +242,10 @@ func waitUntilRecordSetDeployed(d *schema.ResourceData, meta interface{}, status
 	return err
 }
 
-func recordSetStateRefreshFunc(d *schema.ResourceData, meta interface{}, status string) resource.StateRefreshFunc {
+func recordSetStateRefreshFunc(d *schema.ResourceData, meta interface{}, changeID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		log.Printf("[INFO] waiting for %v Complete status", d.Id())
-		rsc, err := meta.(*vinyldns.Client).RecordSetChange(d.Get("zone_id").(string), d.Id(), status)
+		rsc, err := meta.(*vinyldns.Client).RecordSetChange(d.Get("zone_id").(string), d.Id(), changeID)
 		if err != nil {
 			if dErr, ok := err.(*vinyldns.Error); ok {
 				if dErr.ResponseCode == http.StatusNotFound {
