@@ -100,7 +100,7 @@ func testAccCheckVinylDNSRecordSetExists(n string) resource.TestCheckFunc {
 
 func testZoneID() (string, error) {
 	client := testAccProvider.Meta().(*vinyldns.Client)
-	zones, err := client.Zones()
+	zones, err := client.ZonesListAll(vinyldns.ListFilter{})
 	if err != nil {
 		return "", err
 	}
