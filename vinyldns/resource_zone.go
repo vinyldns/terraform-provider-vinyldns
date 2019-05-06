@@ -46,6 +46,10 @@ func resourceVinylDNSZone() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"shared": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"created": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -300,6 +304,11 @@ func zone(d *schema.ResourceData) *vinyldns.Zone {
 
 	if d.Get("transfer_connection.0.name").(string) != "" {
 		zone.TransferConnection = transferConnection(d)
+	}
+
+	shared := d.Get("shared").(bool)
+	if shared == true || shared == false {
+		zone.Shared = shared
 	}
 
 	return zone
