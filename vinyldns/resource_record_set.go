@@ -76,7 +76,7 @@ func resourceVinylDNSRecordSetCreate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
-	created, err := meta.(*vinyldns.Client).RecordSetCreate(d.Get("zone_id").(string), &vinyldns.RecordSet{
+	created, err := meta.(*vinyldns.Client).RecordSetCreate(&vinyldns.RecordSet{
 		Name:    d.Get("name").(string),
 		ZoneID:  d.Get("zone_id").(string),
 		Type:    d.Get("type").(string),
@@ -115,7 +115,7 @@ func resourceVinylDNSRecordSetUpdate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
-	updated, err := meta.(*vinyldns.Client).RecordSetUpdate(d.Get("zone_id").(string), d.Id(), &vinyldns.RecordSet{
+	updated, err := meta.(*vinyldns.Client).RecordSetUpdate(&vinyldns.RecordSet{
 		Name:    d.Get("name").(string),
 		ID:      d.Id(),
 		ZoneID:  d.Get("zone_id").(string),
