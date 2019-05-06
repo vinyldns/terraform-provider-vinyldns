@@ -3,7 +3,7 @@ NAME=terraform-provider-vinyldns
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 VINYLDNS_REPO=github.com/vinyldns/vinyldns
 SOURCE=./...
-VERSION=0.8.3
+VERSION=0.9.0
 
 all: deps start-api test build stop-api
 deps-build: deps build
@@ -20,7 +20,7 @@ start-api:
 		git clone https://$(VINYLDNS_REPO) $(GOPATH)/src/$(VINYLDNS_REPO); \
 	fi
 	$(GOPATH)/src/$(VINYLDNS_REPO)/bin/docker-up-vinyldns.sh \
-		--version 0.8.0 \
+		--version 0.9.1 \
 		--api-only
 
 stop-api:
