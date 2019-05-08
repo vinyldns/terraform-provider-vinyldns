@@ -37,10 +37,6 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"account": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"record_addresses": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
