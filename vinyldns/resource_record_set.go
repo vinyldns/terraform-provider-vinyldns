@@ -29,6 +29,10 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"owner_group_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -73,11 +77,12 @@ func resourceVinylDNSRecordSetCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	created, err := meta.(*vinyldns.Client).RecordSetCreate(&vinyldns.RecordSet{
-		Name:    d.Get("name").(string),
-		ZoneID:  d.Get("zone_id").(string),
-		Type:    d.Get("type").(string),
-		TTL:     d.Get("ttl").(int),
-		Records: records,
+		Name:         d.Get("name").(string),
+		ZoneID:       d.Get("zone_id").(string),
+		OwnerGroupID: d.Get("owner_group_id").(string),
+		Type:         d.Get("type").(string),
+		TTL:          d.Get("ttl").(int),
+		Records:      records,
 	})
 	if err != nil {
 		return err
@@ -112,12 +117,13 @@ func resourceVinylDNSRecordSetUpdate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	updated, err := meta.(*vinyldns.Client).RecordSetUpdate(&vinyldns.RecordSet{
-		Name:    d.Get("name").(string),
-		ID:      d.Id(),
-		ZoneID:  d.Get("zone_id").(string),
-		Type:    d.Get("type").(string),
-		TTL:     d.Get("ttl").(int),
-		Records: records,
+		Name:         d.Get("name").(string),
+		ID:           d.Id(),
+		ZoneID:       d.Get("zone_id").(string),
+		OwnerGroupID: d.Get("owner_group_id").(string),
+		Type:         d.Get("type").(string),
+		TTL:          d.Get("ttl").(int),
+		Records:      records,
 	})
 	if err != nil {
 		return err
