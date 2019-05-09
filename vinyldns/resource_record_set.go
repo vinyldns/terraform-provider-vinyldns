@@ -119,7 +119,7 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 		return nil
 	}
 
-	if recordType == "text" {
+	if recordType == "txt" {
 		d.Set("record_text", rs.Records[0].Text)
 
 		return nil
