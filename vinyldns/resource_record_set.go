@@ -103,8 +103,46 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
+	recordType := strings.ToLower(rs.Type)
+	if recordType == "soa" {
+		return errors.New(recordType + " records are not currently supported by vinyldns")
+	}
 
 	d.Set("name", rs.Name)
+	d.Set("zone_id", rs.ZoneID)
+	d.Set("ttl", rs.TTL)
+	d.Set("type", rs.Type)
+
+	if recordType == "cname" {
+		d.Set("record_cname", rs.Records[0].CName)
+
+		return nil
+	}
+
+	if recordType == "text" {
+		d.Set("record_text", rs.Records[0].Text)
+
+		return nil
+	}
+
+	if recordType == "ns" {
+		recs := make([]interface{}, 0, len(rs.Records))
+
+		for _, r := range rs.Records {
+			recs = append(recs, r.NSDName)
+		}
+
+		d.Set("record_nsdnames", schema.NewSet(schema.HashString, recs))
+
+		return nil
+	}
+
+	recs := make([]interface{}, 0, len(rs.Records))
+	for _, r := range rs.Records {
+		recs = append(recs, r.Address)
+	}
+
+	d.Set("record_addresses", schema.NewSet(schema.HashString, recs))
 
 	return nil
 }
