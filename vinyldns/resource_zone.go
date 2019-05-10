@@ -28,6 +28,9 @@ func resourceVinylDNSZone() *schema.Resource {
 		Read:   resourceVinylDNSZoneRead,
 		Update: resourceVinylDNSZoneUpdate,
 		Delete: resourceVinylDNSZoneDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
