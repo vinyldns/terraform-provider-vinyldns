@@ -13,7 +13,6 @@ limitations under the License.
 package vinyldns
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 
@@ -143,8 +142,7 @@ func userSchema() *schema.Schema {
 				},
 				"last_name": &schema.Schema{
 					Type:     schema.TypeString,
-					Optional: true,
-				},
+					Optional: true},
 				"email": &schema.Schema{
 					Type:     schema.TypeString,
 					Optional: true,
@@ -159,7 +157,9 @@ func userSchema() *schema.Schema {
 				},
 			},
 		},
-		Set: resourceVinylDNSGroupUserHash,
+		Set: func(v interface{}) int {
+			return hashcode.String(v.(string))
+		},
 	}
 }
 
@@ -183,25 +183,11 @@ func usersToVinylDNSUser(userType string, d *schema.ResourceData) []vinyldns.Use
 	return users
 }
 
-func resourceVinylDNSGroupUserHash(v interface{}) int {
-	var buf bytes.Buffer
-	m := v.(map[string]interface{})
-
-	buf.WriteString(fmt.Sprintf("%d-", m["user_name"].(string)))
-	buf.WriteString(fmt.Sprintf("%d-", m["first_name"].(string)))
-	buf.WriteString(fmt.Sprintf("%t-", m["last_name"].(string)))
-	buf.WriteString(fmt.Sprintf("%t-", m["email"].(string)))
-	buf.WriteString(fmt.Sprintf("%t-", m["created"].(string)))
-	buf.WriteString(fmt.Sprintf("%t-", m["id"].(string)))
-
-	return hashcode.String(buf.String())
-}
-
 func usersToSchema(users []vinyldns.User) []map[string]interface{} {
 	var saves []map[string]interface{}
 
 	for _, user := range users {
-		var u map[string]interface{}
+		u := make(map[string]interface{})
 
 		u["user_name"] = user.UserName
 		u["first_name"] = user.FirstName
