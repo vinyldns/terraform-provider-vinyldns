@@ -13,9 +13,11 @@ limitations under the License.
 package vinyldns
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
@@ -53,8 +55,8 @@ func resourceVinylDNSGroupCreate(d *schema.ResourceData, meta interface{}) error
 		Name:        d.Get("name").(string),
 		Email:       d.Get("email").(string),
 		Description: d.Get("description").(string),
-		Members:     users("member", d),
-		Admins:      users("admin", d),
+		Members:     usersToVinylDNSUser("member", d),
+		Admins:      usersToVinylDNSUser("admin", d),
 	})
 	if err != nil {
 		return err
@@ -73,6 +75,24 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("name", g.Name)
+	d.Set("email", g.Email)
+	d.Set("description", g.Description)
+
+	if g.Members != nil {
+		mems := usersToSchema(g.Members)
+
+		if err := d.Set("members", mems); err != nil {
+			log.Printf("[WARN] Error setting members for (%s): %s", d.Id(), err)
+		}
+	}
+
+	if g.Admins != nil {
+		admins := usersToSchema(g.Admins)
+
+		if err := d.Set("admins", admins); err != nil {
+			log.Printf("[WARN] Error setting admins for (%s): %s", d.Id(), err)
+		}
+	}
 
 	return nil
 }
@@ -84,8 +104,8 @@ func resourceVinylDNSGroupUpdate(d *schema.ResourceData, meta interface{}) error
 		Name:        d.Get("name").(string),
 		Email:       d.Get("email").(string),
 		Description: d.Get("description").(string),
-		Members:     users("member", d),
-		Admins:      users("admin", d),
+		Members:     usersToVinylDNSUser("member", d),
+		Admins:      usersToVinylDNSUser("admin", d),
 	})
 	if err != nil {
 		return err
@@ -109,7 +129,7 @@ func resourceVinylDNSGroupDelete(d *schema.ResourceData, meta interface{}) error
 
 func userSchema() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeList,
+		Type:     schema.TypeSet,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
@@ -139,10 +159,11 @@ func userSchema() *schema.Schema {
 				},
 			},
 		},
+		Set: resourceVinylDNSGroupUserHash,
 	}
 }
 
-func users(userType string, d *schema.ResourceData) []vinyldns.User {
+func usersToVinylDNSUser(userType string, d *schema.ResourceData) []vinyldns.User {
 	users := []vinyldns.User{}
 	usersCount := d.Get(fmt.Sprintf("%s.#", userType)).(int)
 
@@ -160,4 +181,37 @@ func users(userType string, d *schema.ResourceData) []vinyldns.User {
 	}
 
 	return users
+}
+
+func resourceVinylDNSGroupUserHash(v interface{}) int {
+	var buf bytes.Buffer
+	m := v.(map[string]interface{})
+
+	buf.WriteString(fmt.Sprintf("%d-", m["user_name"].(string)))
+	buf.WriteString(fmt.Sprintf("%d-", m["first_name"].(string)))
+	buf.WriteString(fmt.Sprintf("%t-", m["last_name"].(string)))
+	buf.WriteString(fmt.Sprintf("%t-", m["email"].(string)))
+	buf.WriteString(fmt.Sprintf("%t-", m["created"].(string)))
+	buf.WriteString(fmt.Sprintf("%t-", m["id"].(string)))
+
+	return hashcode.String(buf.String())
+}
+
+func usersToSchema(users []vinyldns.User) []map[string]interface{} {
+	var saves []map[string]interface{}
+
+	for _, user := range users {
+		var u map[string]interface{}
+
+		u["user_name"] = user.UserName
+		u["first_name"] = user.FirstName
+		u["last_name"] = user.LastName
+		u["email"] = user.Email
+		u["created"] = user.Created
+		u["id"] = user.ID
+
+		saves = append(saves, u)
+	}
+
+	return saves
 }
