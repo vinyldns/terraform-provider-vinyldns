@@ -13,11 +13,9 @@ limitations under the License.
 package vinyldns
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
@@ -160,13 +158,6 @@ func userSchema() *schema.Schema {
 					Required: true,
 				},
 			},
-		},
-		Set: func(v interface{}) int {
-			var buf bytes.Buffer
-			m := v.(map[string]interface{})
-			buf.WriteString(fmt.Sprintf("%s-", m["user_name"].(string)))
-
-			return hashcode.String(buf.String())
 		},
 	}
 }
