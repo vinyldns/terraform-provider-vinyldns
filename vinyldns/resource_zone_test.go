@@ -36,23 +36,6 @@ func TestAccVinylDNSZoneBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "foo@bar.com"),
 				),
 			},
-		},
-	})
-}
-
-func TestAccCheckVinylDNSZoneImportBasic(t *testing.T) {
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccVinylDNSZoneDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccVinylDNSZoneConfigBasic,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "foo@bar.com"),
-				),
-			},
 			{
 				ResourceName:      "vinyldns_zone.test_zone",
 				ImportState:       true,
