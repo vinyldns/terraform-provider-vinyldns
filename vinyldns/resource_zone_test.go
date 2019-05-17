@@ -49,12 +49,12 @@ func TestAccCheckVinylDNSZoneImportBasic(t *testing.T) {
 			{
 				Config: testAccVinylDNSZoneConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "foo@bar.com"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone_import", "name", "system-test."),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone_import", "email", "foo@bar.com"),
 				),
 			},
 			{
-				ResourceName:      "vinyldns_zone.test_zone",
+				ResourceName:      "vinyldns_zone.test_zone_import",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
