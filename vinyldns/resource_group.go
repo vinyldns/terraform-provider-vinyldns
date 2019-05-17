@@ -13,6 +13,7 @@ limitations under the License.
 package vinyldns
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 
@@ -27,6 +28,9 @@ func resourceVinylDNSGroup() *schema.Resource {
 		Read:   resourceVinylDNSGroupRead,
 		Update: resourceVinylDNSGroupUpdate,
 		Delete: resourceVinylDNSGroupDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -80,16 +84,16 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 	if g.Members != nil {
 		mems := usersToSchema(g.Members)
 
-		if err := d.Set("members", mems); err != nil {
-			log.Printf("[WARN] Error setting members for (%s): %s", d.Id(), err)
+		if err := d.Set("member", mems); err != nil {
+			return err
 		}
 	}
 
 	if g.Admins != nil {
 		admins := usersToSchema(g.Admins)
 
-		if err := d.Set("admins", admins); err != nil {
-			log.Printf("[WARN] Error setting admins for (%s): %s", d.Id(), err)
+		if err := d.Set("admin", admins); err != nil {
+			return err
 		}
 	}
 
@@ -158,7 +162,11 @@ func userSchema() *schema.Schema {
 			},
 		},
 		Set: func(v interface{}) int {
-			return hashcode.String(v.(string))
+			var buf bytes.Buffer
+			m := v.(map[string]interface{})
+			buf.WriteString(fmt.Sprintf("%s-", m["user_name"].(string)))
+
+			return hashcode.String(buf.String())
 		},
 	}
 }
