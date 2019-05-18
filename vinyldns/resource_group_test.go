@@ -39,6 +39,10 @@ func TestAccVinylDNSGroupBasic(t *testing.T) {
 				ResourceName:      "vinyldns_group.test_group",
 				ImportState:       true,
 				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"admin",
+					"member",
+				},
 			},
 		},
 	})
