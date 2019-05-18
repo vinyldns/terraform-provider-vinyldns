@@ -91,6 +91,7 @@ func testAccCheckVinylDNSGroupExists(n string) resource.TestCheckFunc {
 	}
 }
 
+// NOTE: the 'ok' user already exists in the localhost VinylDNS API
 const testAccVinylDNSGroupConfigBasic = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"

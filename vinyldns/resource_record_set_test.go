@@ -115,11 +115,18 @@ func testZoneID() (string, error) {
 	return "", nil
 }
 
+// NOTE: the 'ok' user already exists in the localhost VinylDNS API
 const testAccVinylDNSRecordSetConfigBasic = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	description = "some description"
 	email = "tftest@tf.com"
+	member {
+		id = "ok"
+	}
+	admin {
+		id = "ok"
+	}
 }
 
 resource "vinyldns_zone" "test_zone" {
