@@ -38,6 +38,21 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "name", "txt-terraformtestrecordset"),
 				),
 			},
+			{
+				ResourceName:      "vinyldns_record_set.test_a_record_set",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				ResourceName:      "vinyldns_record_set.test_cname_record_set",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				ResourceName:      "vinyldns_record_set.test_txt_record_set",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
