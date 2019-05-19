@@ -40,6 +40,10 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"owner_group_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"account": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -80,11 +84,12 @@ func resourceVinylDNSRecordSetCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	created, err := meta.(*vinyldns.Client).RecordSetCreate(&vinyldns.RecordSet{
-		Name:    d.Get("name").(string),
-		ZoneID:  d.Get("zone_id").(string),
-		Type:    d.Get("type").(string),
-		TTL:     d.Get("ttl").(int),
-		Records: records,
+		Name:         d.Get("name").(string),
+		ZoneID:       d.Get("zone_id").(string),
+		Type:         d.Get("type").(string),
+		TTL:          d.Get("ttl").(int),
+		OwnerGroupID: d.Get("owner_group_id").(string),
+		Records:      records,
 	})
 	if err != nil {
 		return err
@@ -116,6 +121,7 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("zone_id", rs.ZoneID)
 	d.Set("ttl", rs.TTL)
 	d.Set("type", rs.Type)
+	d.Set("owner_group_id", rs.OwnerGroupID)
 
 	if recordType == "cname" {
 		d.Set("record_cname", rs.Records[0].CName)

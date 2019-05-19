@@ -131,6 +131,7 @@ resource "vinyldns_record_set" "test_a_record_set" {
 	type = "A"
 	ttl = 6000
 	record_addresses = ["127.0.0.1", "127.0.0.1"]
+	owner_group_id = "${vinyldns_group.test_group.id}"
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
