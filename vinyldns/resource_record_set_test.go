@@ -128,6 +128,7 @@ resource "vinyldns_zone" "test_zone" {
 resource "vinyldns_record_set" "test_a_record_set" {
 	name = "terraformtestrecordset"
 	zone_id = "${vinyldns_zone.test_zone.id}"
+	owner_group_id = "${vinyldns_group.test_group.id}"
 	type = "A"
 	ttl = 6000
 	record_addresses = ["127.0.0.1", "127.0.0.1"]

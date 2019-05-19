@@ -33,16 +33,16 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"owner_group_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"type": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
 			"ttl": &schema.Schema{
 				Type:     schema.TypeInt,
-				Optional: true,
-			},
-			"owner_group_id": &schema.Schema{
-				Type:     schema.TypeString,
 				Optional: true,
 			},
 			"account": &schema.Schema{
@@ -166,12 +166,13 @@ func resourceVinylDNSRecordSetUpdate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	updated, err := meta.(*vinyldns.Client).RecordSetUpdate(&vinyldns.RecordSet{
-		Name:    d.Get("name").(string),
-		ID:      rsID,
-		ZoneID:  d.Get("zone_id").(string),
-		Type:    d.Get("type").(string),
-		TTL:     d.Get("ttl").(int),
-		Records: records,
+		Name:         d.Get("name").(string),
+		ID:           rsID,
+		ZoneID:       d.Get("zone_id").(string),
+		OwnerGroupID: d.Get("owner_group_id").(string),
+		Type:         d.Get("type").(string),
+		TTL:          d.Get("ttl").(int),
+		Records:      records,
 	})
 	if err != nil {
 		return err
