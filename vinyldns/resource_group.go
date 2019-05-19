@@ -21,10 +21,11 @@ import (
 
 func resourceVinylDNSGroup() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceVinylDNSGroupCreate,
-		Read:   resourceVinylDNSGroupRead,
-		Update: resourceVinylDNSGroupUpdate,
-		Delete: resourceVinylDNSGroupDelete,
+		SchemaVersion: 1,
+		Create:        resourceVinylDNSGroupCreate,
+		Read:          resourceVinylDNSGroupRead,
+		Update:        resourceVinylDNSGroupUpdate,
+		Delete:        resourceVinylDNSGroupDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},

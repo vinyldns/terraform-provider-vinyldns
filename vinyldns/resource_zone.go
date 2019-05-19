@@ -24,10 +24,11 @@ import (
 
 func resourceVinylDNSZone() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceVinylDNSZoneCreate,
-		Read:   resourceVinylDNSZoneRead,
-		Update: resourceVinylDNSZoneUpdate,
-		Delete: resourceVinylDNSZoneDelete,
+		SchemaVersion: 1,
+		Create:        resourceVinylDNSZoneCreate,
+		Read:          resourceVinylDNSZoneRead,
+		Update:        resourceVinylDNSZoneUpdate,
+		Delete:        resourceVinylDNSZoneDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
