@@ -15,10 +15,11 @@ import (
 
 func resourceVinylDNSRecordSet() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceVinylDNSRecordSetCreate,
-		Read:   resourceVinylDNSRecordSetRead,
-		Update: resourceVinylDNSRecordSetUpdate,
-		Delete: resourceVinylDNSRecordSetDelete,
+		SchemaVersion: 1,
+		Create:        resourceVinylDNSRecordSetCreate,
+		Read:          resourceVinylDNSRecordSetRead,
+		Update:        resourceVinylDNSRecordSetUpdate,
+		Delete:        resourceVinylDNSRecordSetDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
