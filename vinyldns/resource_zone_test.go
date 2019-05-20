@@ -28,13 +28,18 @@ func TestAccVinylDNSZoneBasic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccVinylDNSZoneDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVinylDNSZoneConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVinylDNSZoneExists("vinyldns_zone.test_zone"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "foo@bar.com"),
 				),
+			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_zone.test_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
