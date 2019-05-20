@@ -94,7 +94,14 @@ resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	description = "some description"
 	email = "tftest@tf.com"
+	member {
+	  id = "ok"
+	}
+	admin {
+	  id = "ok"
+	}
 }
+
 resource "vinyldns_zone" "test_zone" {
 	name = "system-test."
 	email = "foo@bar.com"
