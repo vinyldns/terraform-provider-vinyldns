@@ -35,6 +35,11 @@ func TestAccVinylDNSGroupBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "name", "terraformtestgroup"),
 				),
 			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_group.test_group",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
