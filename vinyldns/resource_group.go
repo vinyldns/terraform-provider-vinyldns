@@ -13,7 +13,6 @@ limitations under the License.
 package vinyldns
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -126,7 +125,7 @@ func resourceVinylDNSGroupDelete(d *schema.ResourceData, meta interface{}) error
 
 func userSchema() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeList,
+		Type:     schema.TypeSet,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
@@ -161,19 +160,22 @@ func userSchema() *schema.Schema {
 
 func users(userType string, d *schema.ResourceData) []vinyldns.User {
 	users := []vinyldns.User{}
-	usersCount := d.Get(fmt.Sprintf("%s.#", userType)).(int)
 
-	for i := 0; i < usersCount; i++ {
-		prefix := fmt.Sprintf("%s.%d", userType, i)
+	if u, ok := d.GetOk(userType); ok {
+		schemaUsers := u.(*schema.Set).List()
 
-		users = append(users, vinyldns.User{
-			UserName:  d.Get(prefix + ".user_name").(string),
-			FirstName: d.Get(prefix + ".first_name").(string),
-			LastName:  d.Get(prefix + ".last_name").(string),
-			Email:     d.Get(prefix + ".email").(string),
-			Created:   d.Get(prefix + ".created").(string),
-			ID:        d.Get(prefix + ".id").(string),
-		})
+		for _, user := range schemaUsers {
+			u := user.(map[string]interface{})
+
+			users = append(users, vinyldns.User{
+				UserName:  u["user_name"].(string),
+				FirstName: u["first_name"].(string),
+				LastName:  u["last_name"].(string),
+				Email:     u["email"].(string),
+				Created:   u["created"].(string),
+				ID:        u["id"].(string),
+			})
+		}
 	}
 
 	return users
