@@ -21,6 +21,9 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 		Read:          resourceVinylDNSRecordSetRead,
 		Update:        resourceVinylDNSRecordSetUpdate,
 		Delete:        resourceVinylDNSRecordSetDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
