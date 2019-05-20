@@ -24,10 +24,11 @@ import (
 
 func resourceVinylDNSZone() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceVinylDNSZoneCreate,
-		Read:   resourceVinylDNSZoneRead,
-		Update: resourceVinylDNSZoneUpdate,
-		Delete: resourceVinylDNSZoneDelete,
+		SchemaVersion: 1,
+		Create:        resourceVinylDNSZoneCreate,
+		Read:          resourceVinylDNSZoneRead,
+		Update:        resourceVinylDNSZoneUpdate,
+		Delete:        resourceVinylDNSZoneDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -90,6 +91,33 @@ func resourceVinylDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("name", zone.Name)
+	d.Set("email", zone.Email)
+	d.Set("admin_group_id", zone.AdminGroupID)
+	d.Set("status", zone.Status)
+	d.Set("shared", zone.Shared)
+	d.Set("created", zone.Created)
+
+	if zone.Connection != nil {
+		d.Set("zone_connection", []interface{}{
+			map[string]interface{}{
+				"name":           zone.Connection.Name,
+				"key":            zone.Connection.Key,
+				"key_name":       zone.Connection.KeyName,
+				"primary_server": zone.Connection.PrimaryServer,
+			},
+		})
+	}
+
+	if zone.TransferConnection != nil {
+		d.Set("transfer_connection", []interface{}{
+			map[string]interface{}{
+				"name":           zone.TransferConnection.Name,
+				"key":            zone.TransferConnection.Key,
+				"key_name":       zone.TransferConnection.KeyName,
+				"primary_server": zone.TransferConnection.PrimaryServer,
+			},
+		})
+	}
 
 	return nil
 }
