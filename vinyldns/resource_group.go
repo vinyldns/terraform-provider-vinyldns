@@ -73,6 +73,23 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("name", g.Name)
+	d.Set("email", g.Email)
+	d.Set("description", g.Description)
+	if g.Members != nil {
+		mems := schemaUsers(g.Members)
+
+		if err := d.Set("member", mems); err != nil {
+			return err
+		}
+	}
+
+	if g.Admins != nil {
+		admins := schemaUsers(g.Admins)
+
+		if err := d.Set("admin", admins); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -160,4 +177,23 @@ func users(userType string, d *schema.ResourceData) []vinyldns.User {
 	}
 
 	return users
+}
+
+func schemaUsers(users []vinyldns.User) []map[string]interface{} {
+	var saves []map[string]interface{}
+
+	for _, user := range users {
+		u := make(map[string]interface{})
+
+		u["user_name"] = user.UserName
+		u["first_name"] = user.FirstName
+		u["last_name"] = user.LastName
+		u["email"] = user.Email
+		u["created"] = user.Created
+		u["id"] = user.ID
+
+		saves = append(saves, u)
+	}
+
+	return saves
 }
