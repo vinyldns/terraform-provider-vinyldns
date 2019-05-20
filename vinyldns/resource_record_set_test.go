@@ -63,16 +63,12 @@ func testAccVinylDNSRecordSetDestroy(s *terraform.State) error {
 		if rs.Type != "vinyldns_record_set" {
 			continue
 		}
-		id := rs.Primary.ID
-		testZId, err := testZoneID()
-		if err != nil {
-			return fmt.Errorf("Error fetching system-test. zone ID")
-		}
+		zID, rsID := parseTwoPartID(rs.Primary.ID)
 
 		// Try to find the record set
-		_, err = client.RecordSet(testZId, id)
+		_, err := client.RecordSet(zID, rsID)
 		if err == nil {
-			return fmt.Errorf("RecordSet %s still exists", id)
+			return fmt.Errorf("RecordSet %s still exists in zone %s", rsID, zID)
 		}
 	}
 
@@ -91,15 +87,8 @@ func testAccCheckVinylDNSRecordSetExists(n string) resource.TestCheckFunc {
 		}
 
 		client := testAccProvider.Meta().(*vinyldns.Client)
-		testZId, err := testZoneID()
-		if err != nil {
-			return fmt.Errorf("Error fetching system-test. zone ID")
-		}
-		if testZId == "" {
-			return fmt.Errorf("Could not find system-test. zone ID")
-		}
-
-		readRs, err := client.RecordSet(testZId, rs.Primary.ID)
+		zID, rsID := parseTwoPartID(rs.Primary.ID)
+		readRs, err := client.RecordSet(zID, rsID)
 		if err != nil {
 			return err
 		}
@@ -110,23 +99,6 @@ func testAccCheckVinylDNSRecordSetExists(n string) resource.TestCheckFunc {
 
 		return nil
 	}
-}
-
-func testZoneID() (string, error) {
-	client := testAccProvider.Meta().(*vinyldns.Client)
-	zones, err := client.ZonesListAll(vinyldns.ListFilter{})
-	if err != nil {
-		return "", err
-	}
-
-	for _, each := range zones {
-		fmt.Println(each)
-		if each.Name == "system-test." {
-			return each.ID, nil
-		}
-	}
-
-	return "", nil
 }
 
 const testAccVinylDNSRecordSetConfigBasic = `

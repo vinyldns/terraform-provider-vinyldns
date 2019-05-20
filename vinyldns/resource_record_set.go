@@ -97,7 +97,7 @@ func resourceVinylDNSRecordSetCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	d.SetId(created.RecordSet.ID)
+	d.SetId(created.RecordSet.ZoneID + ":" + created.RecordSet.ID)
 
 	err = waitUntilRecordSetDeployed(d, meta, created.ChangeID)
 	if err != nil {
@@ -108,8 +108,9 @@ func resourceVinylDNSRecordSetCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[INFO] Reading vinyldns record set: %s", d.Id())
-	rs, err := meta.(*vinyldns.Client).RecordSet(d.Get("zone_id").(string), d.Id())
+	zID, rsID := parseTwoPartID(d.Id())
+	log.Printf("[INFO] Reading vinyldns record set %s in zone %s", rsID, zID)
+	rs, err := meta.(*vinyldns.Client).RecordSet(zID, rsID)
 	if err != nil {
 		return err
 	}
@@ -170,14 +171,15 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceVinylDNSRecordSetUpdate(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[INFO] Updating vinyldns record set: %s", d.Id())
+	zID, rsID := parseTwoPartID(d.Id())
+	log.Printf("[INFO] Updating vinyldns record set %s in zone %s", rsID, zID)
 	records, err := records(d)
 	if err != nil {
 		return err
 	}
 	updated, err := meta.(*vinyldns.Client).RecordSetUpdate(&vinyldns.RecordSet{
 		Name:         d.Get("name").(string),
-		ID:           d.Id(),
+		ID:           rsID,
 		ZoneID:       d.Get("zone_id").(string),
 		OwnerGroupID: d.Get("owner_group_id").(string),
 		Type:         d.Get("type").(string),
@@ -197,9 +199,10 @@ func resourceVinylDNSRecordSetUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[INFO] Deleting vinyldns record set: %s", d.Id())
+	zID, rsID := parseTwoPartID(d.Id())
+	log.Printf("[INFO] Deleting vinyldns record set %s in zone %s", rsID, zID)
 
-	deleted, err := meta.(*vinyldns.Client).RecordSetDelete(d.Get("zone_id").(string), d.Id())
+	deleted, err := meta.(*vinyldns.Client).RecordSetDelete(d.Get("zone_id").(string), rsID)
 	if err != nil {
 		return err
 	}
@@ -314,8 +317,9 @@ func waitUntilRecordSetDeployed(d *schema.ResourceData, meta interface{}, change
 
 func recordSetStateRefreshFunc(d *schema.ResourceData, meta interface{}, changeID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
+		_, rsID := parseTwoPartID(d.Id())
 		log.Printf("[INFO] waiting for %v Complete status", d.Id())
-		rsc, err := meta.(*vinyldns.Client).RecordSetChange(d.Get("zone_id").(string), d.Id(), changeID)
+		rsc, err := meta.(*vinyldns.Client).RecordSetChange(d.Get("zone_id").(string), rsID, changeID)
 		if err != nil {
 			if dErr, ok := err.(*vinyldns.Error); ok {
 				if dErr.ResponseCode == http.StatusNotFound {
@@ -343,4 +347,10 @@ func recordSetStateRefreshFunc(d *schema.ResourceData, meta interface{}, changeI
 // vinyldns responds 400 to IPv6 addresses represented within `[` `]`
 func removeBrackets(str string) string {
 	return strings.Replace(strings.Replace(str, "[", "", -1), "]", "", -1)
+}
+
+func parseTwoPartID(id string) (string, string) {
+	parts := strings.Split(id, ":")
+
+	return parts[0], parts[1]
 }
