@@ -2,6 +2,7 @@ package vinyldns
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -15,10 +16,11 @@ import (
 
 func resourceVinylDNSRecordSet() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceVinylDNSRecordSetCreate,
-		Read:   resourceVinylDNSRecordSetRead,
-		Update: resourceVinylDNSRecordSetUpdate,
-		Delete: resourceVinylDNSRecordSetDelete,
+		SchemaVersion: 1,
+		Create:        resourceVinylDNSRecordSetCreate,
+		Read:          resourceVinylDNSRecordSetRead,
+		Update:        resourceVinylDNSRecordSetUpdate,
+		Delete:        resourceVinylDNSRecordSetDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -49,6 +51,14 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
+			"record_texts": &schema.Schema{
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set: func(v interface{}) int {
+					return hashcode.String(v.(string))
+				},
+			},
 			"record_nsdnames": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -58,10 +68,6 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				},
 			},
 			"record_cname": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"record_text": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -104,8 +110,58 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
+	recordType := strings.ToLower(rs.Type)
+
+	if recordType == "soa" {
+		return errors.New(recordType + " records are not currently supported by vinyldns")
+	}
 
 	d.Set("name", rs.Name)
+	d.Set("zone_id", rs.ZoneID)
+	d.Set("ttl", rs.TTL)
+	d.Set("type", rs.Type)
+	d.Set("owner_group_id", rs.OwnerGroupID)
+
+	if recordType == "cname" {
+		d.Set("record_cname", rs.Records[0].CName)
+
+		return nil
+	}
+
+	if recordType == "txt" {
+		recs := make([]interface{}, 0, len(rs.Records))
+
+		for _, r := range rs.Records {
+			recs = append(recs, r.Text)
+		}
+
+		d.Set("record_texts", recs)
+
+		return nil
+	}
+
+	if recordType == "ns" {
+		recs := make([]interface{}, 0, len(rs.Records))
+
+		for _, r := range rs.Records {
+			recs = append(recs, r.NSDName)
+		}
+
+		if err := d.Set("record_nsdnames", schema.NewSet(schema.HashString, recs)); err != nil {
+			return fmt.Errorf("error setting record_nsdnames for record set %s: %s", d.Id(), err)
+		}
+
+		return nil
+	}
+
+	recs := make([]interface{}, 0, len(rs.Records))
+	for _, r := range rs.Records {
+		recs = append(recs, r.Address)
+	}
+
+	if err := d.Set("record_addresses", schema.NewSet(schema.HashString, recs)); err != nil {
+		return fmt.Errorf("error setting record_addresses for record set %s: %s", d.Id(), err)
+	}
 
 	return nil
 }
@@ -156,14 +212,14 @@ func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) e
 }
 
 func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
-	recordType := d.Get("type").(string)
+	recordType := strings.ToLower(d.Get("type").(string))
 
 	// SOA records are currently read-only and cannot be created, updated or deleted by vinyldns
-	if recordType == "SOA" {
+	if recordType == "soa" {
 		return []vinyldns.Record{}, errors.New(recordType + " records are not currently supported by vinyldns")
 	}
 
-	if recordType == "CNAME" {
+	if recordType == "cname" {
 		cname := d.Get("record_cname").(string)
 
 		if string(cname[len(cname)-1:]) != "." {
@@ -177,15 +233,11 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 		}, nil
 	}
 
-	if recordType == "TXT" {
-		return []vinyldns.Record{
-			vinyldns.Record{
-				Text: d.Get("record_text").(string),
-			},
-		}, nil
+	if recordType == "txt" {
+		return txtRecordSets(stringSetToStringSlice(d.Get("record_texts").(*schema.Set))), nil
 	}
 
-	if recordType == "NS" {
+	if recordType == "ns" {
 		return nsRecordSets(stringSetToStringSlice(d.Get("record_nsdnames").(*schema.Set))), nil
 	}
 
@@ -199,6 +251,19 @@ func addressRecordSets(addresses []string) []vinyldns.Record {
 	for i := 0; i < recordsCount; i++ {
 		records = append(records, vinyldns.Record{
 			Address: removeBrackets(addresses[i]),
+		})
+	}
+
+	return records
+}
+
+func txtRecordSets(texts []string) []vinyldns.Record {
+	records := []vinyldns.Record{}
+	recordsCount := len(texts)
+
+	for i := 0; i < recordsCount; i++ {
+		records = append(records, vinyldns.Record{
+			Text: texts[i],
 		})
 	}
 

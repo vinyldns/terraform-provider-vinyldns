@@ -22,10 +22,11 @@ import (
 
 func resourceVinylDNSGroup() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceVinylDNSGroupCreate,
-		Read:   resourceVinylDNSGroupRead,
-		Update: resourceVinylDNSGroupUpdate,
-		Delete: resourceVinylDNSGroupDelete,
+		SchemaVersion: 1,
+		Create:        resourceVinylDNSGroupCreate,
+		Read:          resourceVinylDNSGroupRead,
+		Update:        resourceVinylDNSGroupUpdate,
+		Delete:        resourceVinylDNSGroupDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
@@ -73,6 +74,23 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("name", g.Name)
+	d.Set("email", g.Email)
+	d.Set("description", g.Description)
+	if g.Members != nil {
+		mems := schemaUsers(g.Members)
+
+		if err := d.Set("member", mems); err != nil {
+			return fmt.Errorf("error setting member for group %s: %s", d.Id(), err)
+		}
+	}
+
+	if g.Admins != nil {
+		admins := schemaUsers(g.Admins)
+
+		if err := d.Set("admin", admins); err != nil {
+			return fmt.Errorf("error setting admin for group %s: %s", d.Id(), err)
+		}
+	}
 
 	return nil
 }
@@ -109,7 +127,7 @@ func resourceVinylDNSGroupDelete(d *schema.ResourceData, meta interface{}) error
 
 func userSchema() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeList,
+		Type:     schema.TypeSet,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
@@ -144,20 +162,42 @@ func userSchema() *schema.Schema {
 
 func users(userType string, d *schema.ResourceData) []vinyldns.User {
 	users := []vinyldns.User{}
-	usersCount := d.Get(fmt.Sprintf("%s.#", userType)).(int)
 
-	for i := 0; i < usersCount; i++ {
-		prefix := fmt.Sprintf("%s.%d", userType, i)
+	if u, ok := d.GetOk(userType); ok {
+		schemaUsers := u.(*schema.Set).List()
 
-		users = append(users, vinyldns.User{
-			UserName:  d.Get(prefix + ".user_name").(string),
-			FirstName: d.Get(prefix + ".first_name").(string),
-			LastName:  d.Get(prefix + ".last_name").(string),
-			Email:     d.Get(prefix + ".email").(string),
-			Created:   d.Get(prefix + ".created").(string),
-			ID:        d.Get(prefix + ".id").(string),
-		})
+		for _, user := range schemaUsers {
+			u := user.(map[string]interface{})
+
+			users = append(users, vinyldns.User{
+				UserName:  u["user_name"].(string),
+				FirstName: u["first_name"].(string),
+				LastName:  u["last_name"].(string),
+				Email:     u["email"].(string),
+				Created:   u["created"].(string),
+				ID:        u["id"].(string),
+			})
+		}
 	}
 
 	return users
+}
+
+func schemaUsers(users []vinyldns.User) []map[string]interface{} {
+	var saves []map[string]interface{}
+
+	for _, user := range users {
+		u := make(map[string]interface{})
+
+		u["user_name"] = user.UserName
+		u["first_name"] = user.FirstName
+		u["last_name"] = user.LastName
+		u["email"] = user.Email
+		u["created"] = user.Created
+		u["id"] = user.ID
+
+		saves = append(saves, u)
+	}
+
+	return saves
 }
