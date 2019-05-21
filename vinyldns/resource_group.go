@@ -13,6 +13,7 @@ limitations under the License.
 package vinyldns
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -79,7 +80,7 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 		mems := schemaUsers(g.Members)
 
 		if err := d.Set("member", mems); err != nil {
-			return err
+			return fmt.Errorf("error setting member for group %s: %s", d.Id(), err)
 		}
 	}
 
@@ -87,7 +88,7 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 		admins := schemaUsers(g.Admins)
 
 		if err := d.Set("admin", admins); err != nil {
-			return err
+			return fmt.Errorf("error setting admin for group %s: %s", d.Id(), err)
 		}
 	}
 
