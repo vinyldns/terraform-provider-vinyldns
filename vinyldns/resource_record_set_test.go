@@ -35,7 +35,6 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_txt_record_set"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "name", "terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "name", "cname-terraformtestrecordset"),
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "name", "txt-terraformtestrecordset"),
 				),
 			},
 		},
@@ -165,7 +164,7 @@ resource "vinyldns_record_set" "test_txt_record_set" {
 	zone_id = "${vinyldns_zone.test_zone.id}"
 	type = "TXT"
 	ttl = 6000
-	record_text = "Lorem ipsum and all that jazz"
+	record_texts = ["Lorem ipsum and all that jazz"]
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]

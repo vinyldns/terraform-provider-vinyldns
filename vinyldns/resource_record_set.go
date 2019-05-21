@@ -51,6 +51,14 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
+			"record_texts": &schema.Schema{
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set: func(v interface{}) int {
+					return hashcode.String(v.(string))
+				},
+			},
 			"record_nsdnames": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -60,10 +68,6 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				},
 			},
 			"record_cname": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"record_text": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -125,7 +129,13 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if recordType == "txt" {
-		d.Set("record_text", rs.Records[0].Text)
+		recs := make([]interface{}, 0, len(rs.Records))
+
+		for _, r := range rs.Records {
+			recs = append(recs, r.Text)
+		}
+
+		d.Set("record_texts", recs)
 
 		return nil
 	}
@@ -202,14 +212,14 @@ func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) e
 }
 
 func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
-	recordType := d.Get("type").(string)
+	recordType := strings.ToLower(d.Get("type").(string))
 
 	// SOA records are currently read-only and cannot be created, updated or deleted by vinyldns
-	if recordType == "SOA" {
+	if recordType == "soa" {
 		return []vinyldns.Record{}, errors.New(recordType + " records are not currently supported by vinyldns")
 	}
 
-	if recordType == "CNAME" {
+	if recordType == "cname" {
 		cname := d.Get("record_cname").(string)
 
 		if string(cname[len(cname)-1:]) != "." {
@@ -223,15 +233,11 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 		}, nil
 	}
 
-	if recordType == "TXT" {
-		return []vinyldns.Record{
-			vinyldns.Record{
-				Text: d.Get("record_text").(string),
-			},
-		}, nil
+	if recordType == "txt" {
+		return txtRecordSets(stringSetToStringSlice(d.Get("record_texts").(*schema.Set))), nil
 	}
 
-	if recordType == "NS" {
+	if recordType == "ns" {
 		return nsRecordSets(stringSetToStringSlice(d.Get("record_nsdnames").(*schema.Set))), nil
 	}
 
@@ -245,6 +251,19 @@ func addressRecordSets(addresses []string) []vinyldns.Record {
 	for i := 0; i < recordsCount; i++ {
 		records = append(records, vinyldns.Record{
 			Address: removeBrackets(addresses[i]),
+		})
+	}
+
+	return records
+}
+
+func txtRecordSets(texts []string) []vinyldns.Record {
+	records := []vinyldns.Record{}
+	recordsCount := len(texts)
+
+	for i := 0; i < recordsCount; i++ {
+		records = append(records, vinyldns.Record{
+			Text: texts[i],
 		})
 	}
 
