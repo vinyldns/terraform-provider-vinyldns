@@ -2,6 +2,7 @@ package vinyldns
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -136,7 +137,9 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 			recs = append(recs, r.NSDName)
 		}
 
-		d.Set("record_nsdnames", schema.NewSet(schema.HashString, recs))
+		if err := d.Set("record_nsdnames", schema.NewSet(schema.HashString, recs)); err != nil {
+			return fmt.Errorf("error setting record_nsdnames for record set %s: %s", d.Id(), err)
+		}
 
 		return nil
 	}
@@ -146,7 +149,9 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 		recs = append(recs, r.Address)
 	}
 
-	d.Set("record_addresses", schema.NewSet(schema.HashString, recs))
+	if err := d.Set("record_addresses", schema.NewSet(schema.HashString, recs)); err != nil {
+		return fmt.Errorf("error setting record_addresses for record set %s: %s", d.Id(), err)
+	}
 
 	return nil
 }
