@@ -126,22 +126,14 @@ func resourceVinylDNSGroupDelete(d *schema.ResourceData, meta interface{}) error
 			if vErr.ResponseCode == http.StatusNotFound {
 				log.Printf("[WARN] group (%s) not found, error code (404)", d.Id())
 
-				d.SetId("")
-
 				return nil
 			}
-
-			d.SetId("")
 
 			return fmt.Errorf("error deleting group (%s): %s", d.Id(), err)
 		}
 
-		d.SetId("")
-
 		return fmt.Errorf("error deleting group (%s): %s", d.Id(), err)
 	}
-
-	d.SetId("")
 
 	return nil
 }

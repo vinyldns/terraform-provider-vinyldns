@@ -183,17 +183,11 @@ func resourceVinylDNSZoneDelete(d *schema.ResourceData, meta interface{}) error 
 			if vErr.ResponseCode == http.StatusNotFound {
 				log.Printf("[WARN] zone (%s) not found, error code (404)", d.Id())
 
-				d.SetId("")
-
 				return nil
 			}
 
-			d.SetId("")
-
 			return fmt.Errorf("error deleting zone (%s): %s", d.Id(), err)
 		}
-
-		d.SetId("")
 
 		return fmt.Errorf("error deleting zone (%s): %s", d.Id(), err)
 	}
@@ -202,8 +196,6 @@ func resourceVinylDNSZoneDelete(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		return err
 	}
-
-	d.SetId("")
 
 	return nil
 }

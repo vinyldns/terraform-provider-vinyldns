@@ -208,17 +208,11 @@ func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) e
 			if vErr.ResponseCode == http.StatusNotFound {
 				log.Printf("[WARN] recordset (%s) not found, error code (404)", d.Id())
 
-				d.SetId("")
-
 				return nil
 			}
 
-			d.SetId("")
-
 			return fmt.Errorf("error deleting recordset (%s): %s", d.Id(), err)
 		}
-
-		d.SetId("")
 
 		return fmt.Errorf("error deleting recordset (%s): %s", d.Id(), err)
 	}
@@ -227,8 +221,6 @@ func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
-
-	d.SetId("")
 
 	return nil
 }
