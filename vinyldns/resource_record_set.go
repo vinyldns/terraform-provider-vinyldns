@@ -204,7 +204,23 @@ func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) e
 
 	deleted, err := meta.(*vinyldns.Client).RecordSetDelete(d.Get("zone_id").(string), rsID)
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] recordset (%s) not found, error code (404)", d.Id())
+
+				d.SetId("")
+
+				return nil
+			}
+
+			d.SetId("")
+
+			return fmt.Errorf("error deleting recordset (%s): %s", d.Id(), err)
+		}
+
+		d.SetId("")
+
+		return fmt.Errorf("error deleting recordset (%s): %s", d.Id(), err)
 	}
 
 	err = waitUntilRecordSetDeployed(d, meta, deleted.ChangeID)
