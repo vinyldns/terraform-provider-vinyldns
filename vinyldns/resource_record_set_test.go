@@ -53,6 +53,7 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 				ResourceName:      "vinyldns_record_set.test_txt_record_set",
 				ImportState:       true,
 				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSRecordSetImportTXTRecordStateCheck,
 			},
 		},
 	})
@@ -115,6 +116,34 @@ func testAccVinylDNSRecordSetImportCNAMERecordStateCheck(s []*terraform.Instance
 	recordCNAME := rs.Attributes["record_cname"]
 	if recordCNAME != expRecordCNAME {
 		return fmt.Errorf("expected record_cname attribute to be %s, received %s", expRecordCNAME, recordCNAME)
+	}
+
+	return nil
+}
+
+func testAccVinylDNSRecordSetImportTXTRecordStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := "txt-terraformtestrecordset"
+	name := rs.Attributes["name"]
+	if name != expName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expType := "TXT"
+	aType := rs.Attributes["type"]
+	if aType != expType {
+		return fmt.Errorf("expected type attribute to be %s, received %s", expType, aType)
+	}
+
+	expTTL := "6000"
+	ttl := rs.Attributes["ttl"]
+	if ttl != expTTL {
+		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
 	}
 
 	return nil
