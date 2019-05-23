@@ -34,7 +34,17 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_cname_record_set"),
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_txt_record_set"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "name", "terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "type", "A"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "name", "cname-terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "type", "CNAME"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "name", "txt-terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "type", "TXT"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "name", "ns-terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "type", "NS"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "ttl", "6000"),
 				),
 			},
 			resource.TestStep{
@@ -250,8 +260,8 @@ resource "vinyldns_record_set" "test_txt_record_set" {
 	]
 }
 
-resource "vinyldns_record_set" "test_nsd_record_set" {
-	name = "nsd-terraformtestrecordset"
+resource "vinyldns_record_set" "test_ns_record_set" {
+	name = "ns-terraformtestrecordset"
 	zone_id = "${vinyldns_zone.test_zone.id}"
 	type = "NS"
 	ttl = 6000
