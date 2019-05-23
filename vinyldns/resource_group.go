@@ -15,6 +15,7 @@ package vinyldns
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
@@ -121,7 +122,23 @@ func resourceVinylDNSGroupDelete(d *schema.ResourceData, meta interface{}) error
 
 	_, err := meta.(*vinyldns.Client).GroupDelete(d.Id())
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] group (%s) not found, error code (404)", d.Id())
+
+				d.SetId("")
+
+				return nil
+			}
+
+			d.SetId("")
+
+			return fmt.Errorf("error deleting group (%s): %s", d.Id(), err)
+		}
+
+		d.SetId("")
+
+		return fmt.Errorf("error deleting group (%s): %s", d.Id(), err)
 	}
 
 	d.SetId("")
