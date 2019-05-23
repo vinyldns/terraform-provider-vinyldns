@@ -39,6 +39,23 @@ func TestAccVinylDNSGroupBasic(t *testing.T) {
 	})
 }
 
+func TestAccVinylDNSGroupWithoutDescription(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccVinylDNSGroupDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccVinylDNSGroupConfigWithoutDescription,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVinylDNSGroupExists("vinyldns_group.test_group"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "description", "Managed by Terraform"),
+				),
+			},
+		},
+	})
+}
+
 func testAccVinylDNSGroupDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*vinyldns.Client)
 
@@ -78,7 +95,7 @@ func testAccCheckVinylDNSGroupExists(n string) resource.TestCheckFunc {
 		if g.Name != "terraformtestgroup" {
 			return fmt.Errorf("Group not found")
 		}
-		if g.Description != "some description" {
+		if g.Description == "" {
 			return fmt.Errorf("Group 'description' not set")
 		}
 
@@ -90,6 +107,18 @@ const testAccVinylDNSGroupConfigBasic = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	description = "some description"
+	email = "tftest@tf.com"
+	member {
+	  id = "ok"
+	}
+	admin {
+	  id = "ok"
+	}
+}`
+
+const testAccVinylDNSGroupConfigWithoutDescription = `
+resource "vinyldns_group" "test_group" {
+	name = "terraformtestgroup"
 	email = "tftest@tf.com"
 	member {
 	  id = "ok"
