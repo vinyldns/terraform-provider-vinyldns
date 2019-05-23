@@ -33,6 +33,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 			"zone_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"owner_group_id": &schema.Schema{
 				Type:     schema.TypeString,
