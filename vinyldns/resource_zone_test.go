@@ -28,7 +28,7 @@ func TestAccVinylDNSZoneBasic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccVinylDNSZoneDestroy,
 		Steps: []resource.TestStep{
-			{
+			resource.TestStep{
 				Config: testAccVinylDNSZoneConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVinylDNSZoneExists("vinyldns_zone.test_zone"),
@@ -36,8 +36,36 @@ func TestAccVinylDNSZoneBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "foo@bar.com"),
 				),
 			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_zone.test_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSZoneImportStateCheck,
+			},
 		},
 	})
+}
+
+func testAccVinylDNSZoneImportStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := "system-test."
+	name := rs.Attributes["name"]
+	if name != expName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expEmail := "foo@bar.com"
+	email := rs.Attributes["email"]
+	if email != expEmail {
+		return fmt.Errorf("expected email attribute to be %s, received %s", expEmail, email)
+	}
+
+	return nil
 }
 
 func testAccVinylDNSZoneDestroy(s *terraform.State) error {

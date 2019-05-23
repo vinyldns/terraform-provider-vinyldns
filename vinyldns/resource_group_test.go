@@ -35,6 +35,12 @@ func TestAccVinylDNSGroupBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "name", "terraformtestgroup"),
 				),
 			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_group.test_group",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSGroupImportStateCheck,
+			},
 		},
 	})
 }
@@ -54,6 +60,34 @@ func TestAccVinylDNSGroupWithoutDescription(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAccVinylDNSGroupImportStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := "terraformtestgroup"
+	name := rs.Attributes["name"]
+	if name != expName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expDesc := "some description"
+	desc := rs.Attributes["description"]
+	if desc != expDesc {
+		return fmt.Errorf("expected description attribute to be %s, received %s", expDesc, desc)
+	}
+
+	expEmail := "tftest@tf.com"
+	email := rs.Attributes["email"]
+	if email != expEmail {
+		return fmt.Errorf("expected email attribute to be %s, received %s", expEmail, email)
+	}
+
+	return nil
 }
 
 func testAccVinylDNSGroupDestroy(s *terraform.State) error {

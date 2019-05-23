@@ -34,11 +34,163 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_cname_record_set"),
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_txt_record_set"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "name", "terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "type", "A"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "name", "cname-terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "type", "CNAME"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "name", "txt-terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "type", "TXT"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "name", "ns-terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "type", "NS"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "ttl", "6000"),
 				),
+			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_record_set.test_a_record_set",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSRecordSetImportARecordStateCheck,
+			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_record_set.test_cname_record_set",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSRecordSetImportCNAMERecordStateCheck,
+			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_record_set.test_txt_record_set",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSRecordSetImportTXTRecordStateCheck,
+			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_record_set.test_ns_record_set",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSRecordSetImportNSRecordStateCheck,
 			},
 		},
 	})
+}
+
+func testAccVinylDNSRecordSetImportARecordStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := "terraformtestrecordset"
+	name := rs.Attributes["name"]
+	if name != expName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expType := "A"
+	aType := rs.Attributes["type"]
+	if aType != expType {
+		return fmt.Errorf("expected type attribute to be %s, received %s", expType, aType)
+	}
+
+	expTTL := "6000"
+	ttl := rs.Attributes["ttl"]
+	if ttl != expTTL {
+		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
+	}
+
+	return nil
+}
+
+func testAccVinylDNSRecordSetImportCNAMERecordStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := "cname-terraformtestrecordset"
+	name := rs.Attributes["name"]
+	if name != expName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expType := "CNAME"
+	aType := rs.Attributes["type"]
+	if aType != expType {
+		return fmt.Errorf("expected type attribute to be %s, received %s", expType, aType)
+	}
+
+	expTTL := "6000"
+	ttl := rs.Attributes["ttl"]
+	if ttl != expTTL {
+		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
+	}
+
+	expRecordCNAME := "terraformtestrecordset.system-test."
+	recordCNAME := rs.Attributes["record_cname"]
+	if recordCNAME != expRecordCNAME {
+		return fmt.Errorf("expected record_cname attribute to be %s, received %s", expRecordCNAME, recordCNAME)
+	}
+
+	return nil
+}
+
+func testAccVinylDNSRecordSetImportTXTRecordStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := "txt-terraformtestrecordset"
+	name := rs.Attributes["name"]
+	if name != expName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expType := "TXT"
+	aType := rs.Attributes["type"]
+	if aType != expType {
+		return fmt.Errorf("expected type attribute to be %s, received %s", expType, aType)
+	}
+
+	expTTL := "6000"
+	ttl := rs.Attributes["ttl"]
+	if ttl != expTTL {
+		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
+	}
+
+	return nil
+}
+
+func testAccVinylDNSRecordSetImportNSRecordStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := "ns-terraformtestrecordset"
+	name := rs.Attributes["name"]
+	if name != expName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expType := "NS"
+	aType := rs.Attributes["type"]
+	if aType != expType {
+		return fmt.Errorf("expected type attribute to be %s, received %s", expType, aType)
+	}
+
+	expTTL := "6000"
+	ttl := rs.Attributes["ttl"]
+	if ttl != expTTL {
+		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
+	}
+
+	return nil
 }
 
 func testAccVinylDNSRecordSetDestroy(s *terraform.State) error {
@@ -48,16 +200,12 @@ func testAccVinylDNSRecordSetDestroy(s *terraform.State) error {
 		if rs.Type != "vinyldns_record_set" {
 			continue
 		}
-		id := rs.Primary.ID
-		testZId, err := testZoneID()
-		if err != nil {
-			return fmt.Errorf("Error fetching system-test. zone ID")
-		}
+		zID, rsID := parseTwoPartID(rs.Primary.ID)
 
 		// Try to find the record set
-		_, err = client.RecordSet(testZId, id)
+		_, err := client.RecordSet(zID, rsID)
 		if err == nil {
-			return fmt.Errorf("RecordSet %s still exists", id)
+			return fmt.Errorf("RecordSet %s still exists in zone %s", rsID, zID)
 		}
 	}
 
@@ -76,15 +224,8 @@ func testAccCheckVinylDNSRecordSetExists(n string) resource.TestCheckFunc {
 		}
 
 		client := testAccProvider.Meta().(*vinyldns.Client)
-		testZId, err := testZoneID()
-		if err != nil {
-			return fmt.Errorf("Error fetching system-test. zone ID")
-		}
-		if testZId == "" {
-			return fmt.Errorf("Could not find system-test. zone ID")
-		}
-
-		readRs, err := client.RecordSet(testZId, rs.Primary.ID)
+		zID, rsID := parseTwoPartID(rs.Primary.ID)
+		readRs, err := client.RecordSet(zID, rsID)
 		if err != nil {
 			return err
 		}
@@ -95,23 +236,6 @@ func testAccCheckVinylDNSRecordSetExists(n string) resource.TestCheckFunc {
 
 		return nil
 	}
-}
-
-func testZoneID() (string, error) {
-	client := testAccProvider.Meta().(*vinyldns.Client)
-	zones, err := client.ZonesListAll(vinyldns.ListFilter{})
-	if err != nil {
-		return "", err
-	}
-
-	for _, each := range zones {
-		fmt.Println(each)
-		if each.Name == "system-test." {
-			return each.ID, nil
-		}
-	}
-
-	return "", nil
 }
 
 const testAccVinylDNSRecordSetConfigBasic = `
@@ -170,8 +294,8 @@ resource "vinyldns_record_set" "test_txt_record_set" {
 	]
 }
 
-resource "vinyldns_record_set" "test_nsd_record_set" {
-	name = "nsd-terraformtestrecordset"
+resource "vinyldns_record_set" "test_ns_record_set" {
+	name = "ns-terraformtestrecordset"
 	zone_id = "${vinyldns_zone.test_zone.id}"
 	type = "NS"
 	ttl = 6000

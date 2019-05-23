@@ -27,6 +27,9 @@ func resourceVinylDNSGroup() *schema.Resource {
 		Read:          resourceVinylDNSGroupRead,
 		Update:        resourceVinylDNSGroupUpdate,
 		Delete:        resourceVinylDNSGroupDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
