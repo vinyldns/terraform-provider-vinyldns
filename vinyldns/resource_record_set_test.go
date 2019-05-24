@@ -288,7 +288,7 @@ func testAccCheckVinylDNSRecordSetMoveZonesExists(n string) resource.TestCheckFu
 		}
 
 		// confirm that the record set exists in the correct zone
-		expectedZName := "system-test-two."
+		expectedZName := "system-test."
 		if z.Name != expectedZName {
 			fmt.Errorf("expected record set to exist in zone %s; it exists in %s", expectedZName, z.Name)
 		}
@@ -325,7 +325,7 @@ func testAccCheckVinylDNSRecordSetMoveZonesUpdatedExistsInNewZone(n string) reso
 		}
 
 		// confirm that the record set exists in the correct zone after zone_id has changed
-		expectedZName := "system-test-three."
+		expectedZName := "vinyldns."
 		if z.Name != expectedZName {
 			fmt.Errorf("expected record set to exist in zone %s; it exists in %s", expectedZName, z.Name)
 		}
@@ -415,7 +415,7 @@ resource "vinyldns_group" "test_group_2" {
 }
 
 resource "vinyldns_zone" "test_zone_2" {
-	name = "system-test-two."
+	name = "system-test."
 	email = "foo@bar.com"
 	admin_group_id = "${vinyldns_group.test_group_2.id}"
 	depends_on = [
@@ -424,7 +424,7 @@ resource "vinyldns_zone" "test_zone_2" {
 }
 
 resource "vinyldns_zone" "test_zone_3" {
-	name = "system-test-three."
+	name = "vinyldns."
 	email = "foo@bar.com"
 	admin_group_id = "${vinyldns_group.test_group_2.id}"
 	depends_on = [
@@ -458,7 +458,7 @@ resource "vinyldns_group" "test_group_2" {
 }
 
 resource "vinyldns_zone" "test_zone_2" {
-	name = "system-test-two."
+	name = "system-test."
 	email = "foo@bar.com"
 	admin_group_id = "${vinyldns_group.test_group_2.id}"
 	depends_on = [
@@ -467,7 +467,7 @@ resource "vinyldns_zone" "test_zone_2" {
 }
 
 resource "vinyldns_zone" "test_zone_3" {
-	name = "system-test-three."
+	name = "vinyldns."
 	email = "foo@bar.com"
 	admin_group_id = "${vinyldns_group.test_group_2.id}"
 	depends_on = [
