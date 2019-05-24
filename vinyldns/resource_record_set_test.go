@@ -75,6 +75,28 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 	})
 }
 
+func TestAccVinylDNSRecordSetMoveZones(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccVinylDNSRecordSetDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccVinylDNSRecordSetConfigMoveZones("1"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVinylDNSRecordSetMoveZonesExists("vinyldns_record_set.test_a_record_set"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccVinylDNSRecordSetConfigMoveZones("2"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVinylDNSRecordSetMoveZonesUpdatedExistsInNewZone("vinyldns_record_set.test_a_record_set"),
+				),
+			},
+		},
+	})
+}
+
 func testAccVinylDNSRecordSetImportARecordStateCheck(s []*terraform.InstanceState) error {
 	if len(s) != 1 {
 		return fmt.Errorf("expected 1 state: %#v", s)
@@ -238,6 +260,52 @@ func testAccCheckVinylDNSRecordSetExists(n string) resource.TestCheckFunc {
 	}
 }
 
+func testRecordInZone(n string, s *terraform.State, expectedZone string) error {
+	rs, ok := s.RootModule().Resources[n]
+	if !ok {
+		return fmt.Errorf("Not found %s", rs)
+	}
+
+	if rs.Primary.ID == "" {
+		return fmt.Errorf("No RecordSet ID is set")
+	}
+
+	client := testAccProvider.Meta().(*vinyldns.Client)
+	zID, rsID := parseTwoPartID(rs.Primary.ID)
+	readRs, err := client.RecordSet(zID, rsID)
+	if err != nil {
+		return err
+	}
+
+	if readRs.Name != rs.Primary.Attributes["name"] {
+		return fmt.Errorf("Record not found")
+	}
+
+	z, err := client.Zone(zID)
+	if err != nil {
+		return err
+	}
+
+	// confirm that the record set exists in the correct zone
+	if z.Name != expectedZone {
+		fmt.Errorf("expected record set to exist in zone %s; it exists in %s", expectedZone, z.Name)
+	}
+
+	return nil
+}
+
+func testAccCheckVinylDNSRecordSetMoveZonesExists(n string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		return testRecordInZone(n, s, "system-test.")
+	}
+}
+
+func testAccCheckVinylDNSRecordSetMoveZonesUpdatedExistsInNewZone(n string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		return testRecordInZone(n, s, "vinyldns.")
+	}
+}
+
 const testAccVinylDNSRecordSetConfigBasic = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
@@ -304,3 +372,39 @@ resource "vinyldns_record_set" "test_ns_record_set" {
 		"vinyldns_zone.test_zone"
 	]
 }`
+
+func testAccVinylDNSRecordSetConfigMoveZones(z string) string {
+	return fmt.Sprintf(`
+resource "vinyldns_group" "test_group" {
+	name = "terraformtestgrouptwo"
+	description = "some description"
+	email = "tftest@tf.com"
+	member {
+	  id = "ok"
+	}
+	admin {
+	  id = "ok"
+	}
+}
+
+resource "vinyldns_zone" "test_zone_1" {
+	name = "system-test."
+	email = "foo@bar.com"
+	admin_group_id = "${vinyldns_group.test_group.id}"
+}
+
+resource "vinyldns_zone" "test_zone_2" {
+	name = "vinyldns."
+	email = "foo@bar.com"
+	admin_group_id = "${vinyldns_group.test_group.id}"
+}
+
+resource "vinyldns_record_set" "test_a_record_set" {
+	name = "terraformtestrecordsettwo"
+	zone_id = "${vinyldns_zone.test_zone_%s.id}"
+	owner_group_id = "${vinyldns_group.test_group.id}"
+	type = "A"
+	ttl = 6000
+	record_addresses = ["127.0.0.1", "127.0.0.1"]
+}`, z)
+}
