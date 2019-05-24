@@ -112,8 +112,21 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 	log.Printf("[INFO] Reading vinyldns record set %s in zone %s", rsID, zID)
 	rs, err := meta.(*vinyldns.Client).RecordSet(zID, rsID)
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] recordset (%s) not found, error code (404)", rsID)
+
+				d.SetId("")
+
+				return nil
+			}
+
+			return fmt.Errorf("error reading recordset (%s): %s", rsID, err)
+		}
+
+		return fmt.Errorf("error reading recordset (%s): %s", rsID, err)
 	}
+
 	recordType := strings.ToLower(rs.Type)
 
 	if recordType == "soa" {

@@ -75,7 +75,19 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] Reading vinyldns group: %s", d.Id())
 	g, err := meta.(*vinyldns.Client).Group(d.Id())
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] group (%s) not found, error code (404)", d.Id())
+
+				d.SetId("")
+
+				return nil
+			}
+
+			return fmt.Errorf("error reading group (%s): %s", d.Id(), err)
+		}
+
+		return fmt.Errorf("error reading group (%s): %s", d.Id(), err)
 	}
 
 	d.Set("name", g.Name)
