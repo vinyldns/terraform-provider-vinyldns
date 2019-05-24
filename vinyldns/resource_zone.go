@@ -351,6 +351,10 @@ func zone(d *schema.ResourceData) *vinyldns.Zone {
 		AdminGroupID: d.Get("admin_group_id").(string),
 	}
 
+	if d.Id() != "" {
+		zone.ID = d.Id()
+	}
+
 	if d.Get("zone_connection.0.name").(string) != "" {
 		zone.Connection = zoneConnection(d)
 	}
