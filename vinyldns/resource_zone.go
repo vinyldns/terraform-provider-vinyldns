@@ -14,7 +14,9 @@ package vinyldns
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -90,7 +92,19 @@ func resourceVinylDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] Reading vinyldns zone: %s", d.Id())
 	zone, err := meta.(*vinyldns.Client).Zone(d.Id())
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] zone (%s) not found, error code (404)", d.Id())
+
+				d.SetId("")
+
+				return nil
+			}
+
+			return fmt.Errorf("error reading zone (%s): %s", d.Id(), err)
+		}
+
+		return fmt.Errorf("error reading zone (%s): %s", d.Id(), err)
 	}
 
 	d.Set("name", zone.Name)
@@ -177,15 +191,23 @@ func resourceVinylDNSZoneDelete(d *schema.ResourceData, meta interface{}) error 
 
 	_, err := meta.(*vinyldns.Client).ZoneDelete(d.Id())
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] zone (%s) not found, error code (404)", d.Id())
+
+				return nil
+			}
+
+			return fmt.Errorf("error deleting zone (%s): %s", d.Id(), err)
+		}
+
+		return fmt.Errorf("error deleting zone (%s): %s", d.Id(), err)
 	}
 
 	err = waitUntilZoneDeleted(d, meta, d.Id())
 	if err != nil {
 		return err
 	}
-
-	d.SetId("")
 
 	return nil
 }

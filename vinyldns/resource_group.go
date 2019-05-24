@@ -15,6 +15,7 @@ package vinyldns
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
@@ -74,7 +75,19 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] Reading vinyldns group: %s", d.Id())
 	g, err := meta.(*vinyldns.Client).Group(d.Id())
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] group (%s) not found, error code (404)", d.Id())
+
+				d.SetId("")
+
+				return nil
+			}
+
+			return fmt.Errorf("error reading group (%s): %s", d.Id(), err)
+		}
+
+		return fmt.Errorf("error reading group (%s): %s", d.Id(), err)
 	}
 
 	d.Set("name", g.Name)
@@ -121,10 +134,18 @@ func resourceVinylDNSGroupDelete(d *schema.ResourceData, meta interface{}) error
 
 	_, err := meta.(*vinyldns.Client).GroupDelete(d.Id())
 	if err != nil {
-		return err
-	}
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] group (%s) not found, error code (404)", d.Id())
 
-	d.SetId("")
+				return nil
+			}
+
+			return fmt.Errorf("error deleting group (%s): %s", d.Id(), err)
+		}
+
+		return fmt.Errorf("error deleting group (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }

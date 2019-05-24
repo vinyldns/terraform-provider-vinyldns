@@ -112,8 +112,21 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 	log.Printf("[INFO] Reading vinyldns record set %s in zone %s", rsID, zID)
 	rs, err := meta.(*vinyldns.Client).RecordSet(zID, rsID)
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] recordset (%s) not found, error code (404)", rsID)
+
+				d.SetId("")
+
+				return nil
+			}
+
+			return fmt.Errorf("error reading recordset (%s): %s", rsID, err)
+		}
+
+		return fmt.Errorf("error reading recordset (%s): %s", rsID, err)
 	}
+
 	recordType := strings.ToLower(rs.Type)
 
 	if recordType == "soa" {
@@ -204,15 +217,23 @@ func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) e
 
 	deleted, err := meta.(*vinyldns.Client).RecordSetDelete(d.Get("zone_id").(string), rsID)
 	if err != nil {
-		return err
+		if vErr, ok := err.(*vinyldns.Error); ok {
+			if vErr.ResponseCode == http.StatusNotFound {
+				log.Printf("[WARN] recordset (%s) not found, error code (404)", d.Id())
+
+				return nil
+			}
+
+			return fmt.Errorf("error deleting recordset (%s): %s", d.Id(), err)
+		}
+
+		return fmt.Errorf("error deleting recordset (%s): %s", d.Id(), err)
 	}
 
 	err = waitUntilRecordSetDeployed(d, meta, deleted.ChangeID)
 	if err != nil {
 		return err
 	}
-
-	d.SetId("")
 
 	return nil
 }
