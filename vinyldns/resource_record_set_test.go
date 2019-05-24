@@ -82,15 +82,15 @@ func TestAccVinylDNSRecordSetMoveZones(t *testing.T) {
 		CheckDestroy: testAccVinylDNSRecordSetDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccVinylDNSRecordSetConfigMoveZones,
+				Config: testAccVinylDNSRecordSetConfigMoveZones("1"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSRecordSetMoveZonesExists("vinyldns_record_set.test_a_record_set_2"),
+					testAccCheckVinylDNSRecordSetMoveZonesExists("vinyldns_record_set.test_a_record_set"),
 				),
 			},
 			resource.TestStep{
-				Config: testAccVinylDNSRecordSetConfigMoveZonesUpdated,
+				Config: testAccVinylDNSRecordSetConfigMoveZones("2"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSRecordSetMoveZonesUpdatedExistsInNewZone("vinyldns_record_set.test_a_record_set_2"),
+					testAccCheckVinylDNSRecordSetMoveZonesUpdatedExistsInNewZone("vinyldns_record_set.test_a_record_set"),
 				),
 			},
 		},
@@ -260,77 +260,49 @@ func testAccCheckVinylDNSRecordSetExists(n string) resource.TestCheckFunc {
 	}
 }
 
+func testRecordInZone(n string, s *terraform.State, expectedZone string) error {
+	rs, ok := s.RootModule().Resources[n]
+	if !ok {
+		return fmt.Errorf("Not found %s", rs)
+	}
+
+	if rs.Primary.ID == "" {
+		return fmt.Errorf("No RecordSet ID is set")
+	}
+
+	client := testAccProvider.Meta().(*vinyldns.Client)
+	zID, rsID := parseTwoPartID(rs.Primary.ID)
+	readRs, err := client.RecordSet(zID, rsID)
+	if err != nil {
+		return err
+	}
+
+	if readRs.Name != rs.Primary.Attributes["name"] {
+		return fmt.Errorf("Record not found")
+	}
+
+	z, err := client.Zone(zID)
+	if err != nil {
+		return err
+	}
+
+	// confirm that the record set exists in the correct zone
+	if z.Name != expectedZone {
+		fmt.Errorf("expected record set to exist in zone %s; it exists in %s", expectedZone, z.Name)
+	}
+
+	return nil
+}
+
 func testAccCheckVinylDNSRecordSetMoveZonesExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Not found %s", rs)
-		}
-
-		if rs.Primary.ID == "" {
-			return fmt.Errorf("No RecordSet ID is set")
-		}
-
-		client := testAccProvider.Meta().(*vinyldns.Client)
-		zID, rsID := parseTwoPartID(rs.Primary.ID)
-		readRs, err := client.RecordSet(zID, rsID)
-		if err != nil {
-			return err
-		}
-
-		if readRs.Name != rs.Primary.Attributes["name"] {
-			return fmt.Errorf("Record not found")
-		}
-
-		z, err := client.Zone(zID)
-		if err != nil {
-			return err
-		}
-
-		// confirm that the record set exists in the correct zone
-		expectedZName := "system-test."
-		if z.Name != expectedZName {
-			fmt.Errorf("expected record set to exist in zone %s; it exists in %s", expectedZName, z.Name)
-		}
-
-		return nil
+		return testRecordInZone(n, s, "system-test.")
 	}
 }
 
 func testAccCheckVinylDNSRecordSetMoveZonesUpdatedExistsInNewZone(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Not found %s", rs)
-		}
-
-		if rs.Primary.ID == "" {
-			return fmt.Errorf("No RecordSet ID is set")
-		}
-
-		client := testAccProvider.Meta().(*vinyldns.Client)
-		zID, rsID := parseTwoPartID(rs.Primary.ID)
-		readRs, err := client.RecordSet(zID, rsID)
-		if err != nil {
-			return err
-		}
-
-		if readRs.Name != rs.Primary.Attributes["name"] {
-			return fmt.Errorf("Record not found")
-		}
-
-		z, err := client.Zone(zID)
-		if err != nil {
-			return err
-		}
-
-		// confirm that the record set exists in the correct zone after zone_id has changed
-		expectedZName := "vinyldns."
-		if z.Name != expectedZName {
-			fmt.Errorf("expected record set to exist in zone %s; it exists in %s", expectedZName, z.Name)
-		}
-
-		return nil
+		return testRecordInZone(n, s, "vinyldns.")
 	}
 }
 
@@ -401,8 +373,9 @@ resource "vinyldns_record_set" "test_ns_record_set" {
 	]
 }`
 
-const testAccVinylDNSRecordSetConfigMoveZones = `
-resource "vinyldns_group" "test_group_2" {
+func testAccVinylDNSRecordSetConfigMoveZones(z string) string {
+	return fmt.Sprintf(`
+resource "vinyldns_group" "test_group" {
 	name = "terraformtestgrouptwo"
 	description = "some description"
 	email = "tftest@tf.com"
@@ -414,75 +387,24 @@ resource "vinyldns_group" "test_group_2" {
 	}
 }
 
-resource "vinyldns_zone" "test_zone_2" {
+resource "vinyldns_zone" "test_zone_1" {
 	name = "system-test."
 	email = "foo@bar.com"
-	admin_group_id = "${vinyldns_group.test_group_2.id}"
-	depends_on = [
-		"vinyldns_group.test_group_2"
-	]
-}
-
-resource "vinyldns_zone" "test_zone_3" {
-	name = "vinyldns."
-	email = "foo@bar.com"
-	admin_group_id = "${vinyldns_group.test_group_2.id}"
-	depends_on = [
-		"vinyldns_group.test_group_2"
-	]
-}
-
-resource "vinyldns_record_set" "test_a_record_set_2" {
-	name = "terraformtestrecordsettwo"
-	zone_id = "${vinyldns_zone.test_zone_2.id}"
-	owner_group_id = "${vinyldns_group.test_group_2.id}"
-	type = "A"
-	ttl = 6000
-	record_addresses = ["127.0.0.1", "127.0.0.1"]
-	depends_on = [
-		"vinyldns_zone.test_zone_2"
-	]
-}`
-
-const testAccVinylDNSRecordSetConfigMoveZonesUpdated = `
-resource "vinyldns_group" "test_group_2" {
-	name = "terraformtestgrouptwo"
-	description = "some description"
-	email = "tftest@tf.com"
-	member {
-	  id = "ok"
-	}
-	admin {
-	  id = "ok"
-	}
+	admin_group_id = "${vinyldns_group.test_group.id}"
 }
 
 resource "vinyldns_zone" "test_zone_2" {
-	name = "system-test."
-	email = "foo@bar.com"
-	admin_group_id = "${vinyldns_group.test_group_2.id}"
-	depends_on = [
-		"vinyldns_group.test_group_2"
-	]
-}
-
-resource "vinyldns_zone" "test_zone_3" {
 	name = "vinyldns."
 	email = "foo@bar.com"
-	admin_group_id = "${vinyldns_group.test_group_2.id}"
-	depends_on = [
-		"vinyldns_group.test_group_2"
-	]
+	admin_group_id = "${vinyldns_group.test_group.id}"
 }
 
-resource "vinyldns_record_set" "test_a_record_set_2" {
+resource "vinyldns_record_set" "test_a_record_set" {
 	name = "terraformtestrecordsettwo"
-	zone_id = "${vinyldns_zone.test_zone_3.id}"
-	owner_group_id = "${vinyldns_group.test_group_2.id}"
+	zone_id = "${vinyldns_zone.test_zone_%s.id}"
+	owner_group_id = "${vinyldns_group.test_group.id}"
 	type = "A"
 	ttl = 6000
 	record_addresses = ["127.0.0.1", "127.0.0.1"]
-	depends_on = [
-		"vinyldns_zone.test_zone_2"
-	]
-}`
+}`, z)
+}
