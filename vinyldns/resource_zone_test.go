@@ -29,11 +29,19 @@ func TestAccVinylDNSZoneBasic(t *testing.T) {
 		CheckDestroy: testAccVinylDNSZoneDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigBasic,
+				Config: testAccVinylDNSZoneConfigBasic("email@foo.com"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVinylDNSZoneExists("vinyldns_zone.test_zone"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "foo@bar.com"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "email@foo.com"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccVinylDNSZoneConfigBasic("updated_email@foo.com"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVinylDNSZoneUpdatedExists("vinyldns_zone.test_zone"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "updated_email@foo.com"),
 				),
 			},
 			resource.TestStep{
@@ -59,7 +67,7 @@ func testAccVinylDNSZoneImportStateCheck(s []*terraform.InstanceState) error {
 		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
 	}
 
-	expEmail := "foo@bar.com"
+	expEmail := "updated_foo@bar.com"
 	email := rs.Attributes["email"]
 	if email != expEmail {
 		return fmt.Errorf("expected email attribute to be %s, received %s", expEmail, email)
@@ -92,35 +100,49 @@ func testAccVinylDNSZoneDestroy(s *terraform.State) error {
 
 func testAccCheckVinylDNSZoneExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Not found %s", rs)
-		}
-		log.Printf("[INFO] testing that zone exists: %s", rs.Primary.ID)
-
-		if rs.Primary.ID == "" {
-			return fmt.Errorf("No Zone ID is set")
-		}
-
-		client := testAccProvider.Meta().(*vinyldns.Client)
-
-		readZone, err := client.Zone(rs.Primary.ID)
-		if err != nil {
-			return err
-		}
-
-		if readZone.Name != "system-test." {
-			return fmt.Errorf("Zone not found")
-		}
-
-		return nil
+		return testAccCheckZoneExists("email@foo.com", n, s)
 	}
 }
 
-const testAccVinylDNSZoneConfigBasic = `
+func testAccCheckVinylDNSZoneUpdatedExists(n string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		return testAccCheckZoneExists("updated_email@foo.com", n, s)
+	}
+}
+
+func testAccCheckZoneExists(email string, n string, s *terraform.State) error {
+	rs, ok := s.RootModule().Resources[n]
+	if !ok {
+		return fmt.Errorf("Not found %s", rs)
+	}
+	log.Printf("[INFO] testing that zone exists: %s", rs.Primary.ID)
+
+	if rs.Primary.ID == "" {
+		return fmt.Errorf("No Zone ID is set")
+	}
+
+	client := testAccProvider.Meta().(*vinyldns.Client)
+
+	readZone, err := client.Zone(rs.Primary.ID)
+	if err != nil {
+		return err
+	}
+
+	if readZone.Name != "system-test." {
+		return fmt.Errorf("Zone %s not found", "system-test.")
+	}
+
+	if readZone.Email != email {
+		return fmt.Errorf("Zone %s with email %s not found", "system-test.", email)
+	}
+
+	return nil
+}
+
+func testAccVinylDNSZoneConfigBasic(email string) string {
+	return fmt.Sprintf(`
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
-	description = "some description"
 	email = "tftest@tf.com"
 	member {
 	  id = "ok"
@@ -132,9 +154,10 @@ resource "vinyldns_group" "test_group" {
 
 resource "vinyldns_zone" "test_zone" {
 	name = "system-test."
-	email = "foo@bar.com"
+	email = "%s"
 	admin_group_id = "${vinyldns_group.test_group.id}"
 	depends_on = [
 		"vinyldns_group.test_group"
 	]
-}`
+}`, email)
+}
