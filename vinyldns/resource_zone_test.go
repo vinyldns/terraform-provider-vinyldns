@@ -140,7 +140,7 @@ func testAccCheckZoneExists(email string, n string, s *terraform.State) error {
 }
 
 func testAccVinylDNSZoneConfigBasic(email string) string {
-	return fmt.Sprintf(`
+	const t = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	email = "tftest@tf.com"
@@ -159,5 +159,7 @@ resource "vinyldns_zone" "test_zone" {
 	depends_on = [
 		"vinyldns_group.test_group"
 	]
-}`, email)
+}`
+
+	return fmt.Sprintf(t, email)
 }
