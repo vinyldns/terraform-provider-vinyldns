@@ -146,7 +146,7 @@ func resourceVinylDNSZoneUpdate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	err = waitUntilZoneChangeDeployed(d, meta, change.Zone.ID)
+	err = waitUntilZoneChangeDeployed(d, meta, change.ID)
 	if err != nil {
 		return err
 	}
@@ -229,7 +229,7 @@ func waitUntilZoneChangeDeployed(d *schema.ResourceData, meta interface{}, chang
 
 func zoneStateRefreshFunc(d *schema.ResourceData, meta interface{}, changeID string) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		log.Printf("[INFO] waiting for Complete status of %v, %s", d.Get("name"), d.Id())
+		log.Printf("[INFO] waiting for Complete status of zone %v (ID %s) for change ID %s", d.Get("name"), d.Id(), changeID)
 		zc, err := meta.(*vinyldns.Client).ZoneChange(d.Id(), changeID)
 		if err != nil {
 			log.Printf("[ERROR] %#v", err)
@@ -349,6 +349,10 @@ func zone(d *schema.ResourceData) *vinyldns.Zone {
 		Name:         d.Get("name").(string),
 		Email:        d.Get("email").(string),
 		AdminGroupID: d.Get("admin_group_id").(string),
+	}
+
+	if d.Id() != "" {
+		zone.ID = d.Id()
 	}
 
 	if d.Get("zone_connection.0.name").(string) != "" {
