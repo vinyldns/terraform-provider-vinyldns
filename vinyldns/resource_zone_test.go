@@ -67,7 +67,7 @@ func testAccVinylDNSZoneImportStateCheck(s []*terraform.InstanceState) error {
 		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
 	}
 
-	expEmail := "updated_foo@bar.com"
+	expEmail := "updated_email@foo.com"
 	email := rs.Attributes["email"]
 	if email != expEmail {
 		return fmt.Errorf("expected email attribute to be %s, received %s", expEmail, email)
