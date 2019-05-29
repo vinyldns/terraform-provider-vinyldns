@@ -152,12 +152,8 @@ resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	description = "%s"
 	email = "tftest@tf.com"
-	member {
-	  id = "ok"
-	}
-	admin {
-	  id = "ok"
-	}
+	member_ids = ["ok"]
+	admin_ids = ["ok"]
 }`
 
 	return fmt.Sprintf(t, desc)
@@ -167,10 +163,6 @@ const testAccVinylDNSGroupConfigWithoutDescription = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	email = "tftest@tf.com"
-	member {
-	  id = "ok"
-	}
-	admin {
-	  id = "ok"
-	}
+	member_ids = ["ok"]
+	admin_ids = ["ok"]
 }`

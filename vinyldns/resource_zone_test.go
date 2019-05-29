@@ -144,12 +144,8 @@ func testAccVinylDNSZoneConfigBasic(email string) string {
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	email = "tftest@tf.com"
-	member {
-	  id = "ok"
-	}
-	admin {
-	  id = "ok"
-	}
+	member_ids = ["ok"]
+	admin_ids = ["ok"]
 }
 
 resource "vinyldns_zone" "test_zone" {
