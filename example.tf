@@ -1,5 +1,7 @@
 resource "vinyldns_group" "test_group" {
   name = "terraform-provider-test-group"
+  member_ids = ["123"]
+  admin_ids = ["123"]
 }
 
 resource "vinyldns_zone" "test_zone" {
