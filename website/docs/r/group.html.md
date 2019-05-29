@@ -15,6 +15,8 @@ The group resource allows VinylDNS groups to be created and managed.
 # Create a VinylDNS group
 resource "vinyldns_group" "test_group" {
   name = "terraform-provider-test-group"
+  member_ids = ["123"]
+  admin_ids = ["123"]
 }
 ```
 
@@ -28,32 +30,6 @@ The following arguments are supported:
 
 * `description` - (Optional) A description of the group.
 
-* `member` - (Optional) A member to associate with the group.
-  See [member](#member) below for details.
+* `member_ids` - (Required) A list of member IDs to associate with the group.
 
-* `admin` - (Optional) An admin to associate with the group.
-  See [admin](#admin) below for details.
-
-### Member
-
-* `username` - (Optional) The member's username.
-
-* `first_name` - (Optional) The member's first name.
-
-* `last_name` - (Optional) The member's last name.
-
-* `email` - (Optional) The member's email address.
-
-* `id` - (Required) The member's UUID.
-
-### Admin
-
-* `username` - (Optional) The member's username.
-
-* `first_name` - (Optional) The member's first name.
-
-* `last_name` - (Optional) The member's last name.
-
-* `email` - (Optional) The member's email address.
-
-* `id` - (Required) The member's UUID.
+* `admin_ids` - (Required) A list of admin IDs to associate with the group.
