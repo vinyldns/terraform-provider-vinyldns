@@ -43,11 +43,12 @@ The following arguments are supported:
 * `ttl` - (Optional) The DNS record set's TTL, or time to live.
 
 * `record_addresses` - (Optional) A list of the record set's addresses.
-  See [record addresses](#record-addresses) below for details.
+
+* `record_texts` - (Optional) If the record is a TXT record, a list of the record set's text values.
+
+* `record_nsdnames` - (Optional) If the record is an NS record, a list of the record set's nsdname values.
 
 * `record_cname` - (Optional) If the record is a CNAME, the record's value.
-
-* `record_text` - (Optional) If the record is a text record, the record's value.
 
 ## Attributes Reference
 
