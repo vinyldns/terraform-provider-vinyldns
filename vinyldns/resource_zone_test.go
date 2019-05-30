@@ -31,7 +31,7 @@ func TestAccVinylDNSZoneBasic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccVinylDNSZoneConfigBasic("email@foo.com"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneExists("vinyldns_zone.test_zone"),
+					testAccCheckVinylDNSZoneBasicExists("vinyldns_zone.test_zone", "email@foo.com"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "email@foo.com"),
 				),
@@ -39,7 +39,39 @@ func TestAccVinylDNSZoneBasic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccVinylDNSZoneConfigBasic("updated_email@foo.com"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneUpdatedExists("vinyldns_zone.test_zone"),
+					testAccCheckVinylDNSZoneBasicExists("vinyldns_zone.test_zone", "updated_email@foo.com"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "updated_email@foo.com"),
+				),
+			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_zone.test_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSZoneImportStateCheck,
+			},
+		},
+	})
+}
+
+func TestAccVinylDNSZoneWithACL(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccVinylDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccVinylDNSZoneConfigWithACL("email@foo.com"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", "email@foo.com"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "email@foo.com"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccVinylDNSZoneConfigWithACL("updated_email@foo.com"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", "updated_email@foo.com"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "updated_email@foo.com"),
 				),
@@ -98,48 +130,108 @@ func testAccVinylDNSZoneDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckVinylDNSZoneExists(n string) resource.TestCheckFunc {
+func testAccCheckVinylDNSZoneBasicExists(n, email string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		return testAccCheckZoneExists("email@foo.com", n, s)
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return fmt.Errorf("Not found %s", rs)
+		}
+		log.Printf("[INFO] testing that zone exists: %s", rs.Primary.ID)
+
+		if rs.Primary.ID == "" {
+			return fmt.Errorf("No Zone ID is set")
+		}
+
+		client := testAccProvider.Meta().(*vinyldns.Client)
+
+		readZone, err := client.Zone(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+
+		if readZone.Name != "system-test." {
+			return fmt.Errorf("Zone %s not found", "system-test.")
+		}
+
+		if readZone.Email != email {
+			return fmt.Errorf("Zone %s with email %s not found", "system-test.", email)
+		}
+
+		return nil
 	}
 }
 
-func testAccCheckVinylDNSZoneUpdatedExists(n string) resource.TestCheckFunc {
+func testAccCheckVinylDNSZoneWithACLExists(n, email string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		return testAccCheckZoneExists("updated_email@foo.com", n, s)
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return fmt.Errorf("Not found %s", rs)
+		}
+		log.Printf("[INFO] testing that zone exists: %s", rs.Primary.ID)
+
+		if rs.Primary.ID == "" {
+			return fmt.Errorf("No Zone ID is set")
+		}
+
+		client := testAccProvider.Meta().(*vinyldns.Client)
+
+		readZone, err := client.Zone(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+
+		if readZone.Name != "system-test." {
+			return fmt.Errorf("Zone %s not found", "system-test.")
+		}
+
+		if readZone.Email != email {
+			return fmt.Errorf("Zone %s with email %s not found", "system-test.", email)
+		}
+
+		acl := readZone.ACL.Rules[0]
+
+		if acl.GroupID == "" {
+			return fmt.Errorf("Zone %s ACL rule has an empty GroupID", "system-test.")
+		}
+
+		if acl.AccessLevel != "Delete" {
+			return fmt.Errorf("Expected Zone %s ACL rule AccessLevel to be 'Delete'; got %s", "system-test.", acl.AccessLevel)
+		}
+
+		if acl.RecordTypes[0] != "TXT" {
+			return fmt.Errorf("Expected Zone %s ACL rule RecordTypes to include 'TXT'; got %s", "system-test.", acl.RecordTypes[0])
+		}
+
+		return nil
 	}
-}
-
-func testAccCheckZoneExists(email string, n string, s *terraform.State) error {
-	rs, ok := s.RootModule().Resources[n]
-	if !ok {
-		return fmt.Errorf("Not found %s", rs)
-	}
-	log.Printf("[INFO] testing that zone exists: %s", rs.Primary.ID)
-
-	if rs.Primary.ID == "" {
-		return fmt.Errorf("No Zone ID is set")
-	}
-
-	client := testAccProvider.Meta().(*vinyldns.Client)
-
-	readZone, err := client.Zone(rs.Primary.ID)
-	if err != nil {
-		return err
-	}
-
-	if readZone.Name != "system-test." {
-		return fmt.Errorf("Zone %s not found", "system-test.")
-	}
-
-	if readZone.Email != email {
-		return fmt.Errorf("Zone %s with email %s not found", "system-test.", email)
-	}
-
-	return nil
 }
 
 func testAccVinylDNSZoneConfigBasic(email string) string {
+	const t = `
+resource "vinyldns_group" "test_group" {
+	name = "terraformtestgroup"
+	email = "tftest@tf.com"
+	member {
+	  id = "ok"
+	}
+	admin {
+	  id = "ok"
+	}
+}
+
+resource "vinyldns_zone" "test_zone" {
+	name = "system-test."
+	email = "%s"
+	admin_group_id = "${vinyldns_group.test_group.id}"
+	depends_on = [
+		"vinyldns_group.test_group"
+	]
+}`
+
+	return fmt.Sprintf(t, email)
+}
+
+func testAccVinylDNSZoneConfigWithACL(email string) string {
 	const t = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
@@ -152,6 +244,11 @@ resource "vinyldns_zone" "test_zone" {
 	name = "system-test."
 	email = "%s"
 	admin_group_id = "${vinyldns_group.test_group.id}"
+	acl_rule {
+		access_level = "Delete"
+		group_id = "${vinyldns_group.test_group.id}"
+		record_types = ["TXT"]
+	}
 	depends_on = [
 		"vinyldns_group.test_group"
 	]
