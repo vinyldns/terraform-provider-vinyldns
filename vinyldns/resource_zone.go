@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
@@ -93,9 +92,6 @@ func resourceVinylDNSZone() *schema.Resource {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
-							Set: func(v interface{}) int {
-								return hashcode.String(v.(string))
-							},
 						},
 					},
 				},
@@ -436,7 +432,7 @@ func aclRules(d *schema.ResourceData) []vinyldns.ACLRule {
 				UserID:      r["user_id"].(string),
 				GroupID:     r["group_id"].(string),
 				RecordMask:  r["record_mask"].(string),
-				RecordTypes: aclRecordTypes(d),
+				//RecordTypes: aclRecordTypes(r["record_types"].(*schema.Set)),
 			})
 		}
 	}
@@ -444,13 +440,15 @@ func aclRules(d *schema.ResourceData) []vinyldns.ACLRule {
 	return rules
 }
 
-func aclRecordTypes(d *schema.ResourceData) []string {
-	typeVals := stringSetToStringSlice(d.Get("record_types").(*schema.Set))
+func aclRecordTypes(rt *schema.Set) []string {
+	rtList := rt.List()
 	types := []string{}
-	count := len(typeVals)
+	count := rt.Len()
 
 	for i := 0; i < count; i++ {
-		types = append(types, typeVals[i])
+		if str, ok := rtList[i].(string); ok {
+			types = append(types, str)
+		}
 	}
 
 	return types
@@ -467,7 +465,7 @@ func schemaACLRules(rules *vinyldns.ZoneACL) []map[string]interface{} {
 		r["user_id"] = rule.UserID
 		r["group_id"] = rule.GroupID
 		r["record_mask"] = rule.RecordMask
-		r["record_types"] = rule.RecordTypes
+		//r["record_types"] = rule.RecordTypes
 
 		saves = append(saves, r)
 	}

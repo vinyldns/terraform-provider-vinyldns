@@ -198,9 +198,11 @@ func testAccCheckVinylDNSZoneWithACLExists(n, email string) resource.TestCheckFu
 			return fmt.Errorf("Expected Zone %s ACL rule AccessLevel to be 'Delete'; got %s", "system-test.", acl.AccessLevel)
 		}
 
-		if acl.RecordTypes[0] != "TXT" {
-			return fmt.Errorf("Expected Zone %s ACL rule RecordTypes to include 'TXT'; got %s", "system-test.", acl.RecordTypes[0])
-		}
+		/*
+			if acl.RecordTypes[0] != "TXT" {
+				return fmt.Errorf("Expected Zone %s ACL rule RecordTypes to include 'TXT'; got %s", "system-test.", acl.RecordTypes[0])
+			}
+		*/
 
 		return nil
 	}
@@ -211,12 +213,8 @@ func testAccVinylDNSZoneConfigBasic(email string) string {
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	email = "tftest@tf.com"
-	member {
-	  id = "ok"
-	}
-	admin {
-	  id = "ok"
-	}
+	member_ids = ["ok"]
+	admin_ids = ["ok"]
 }
 
 resource "vinyldns_zone" "test_zone" {
@@ -247,7 +245,6 @@ resource "vinyldns_zone" "test_zone" {
 	acl_rule {
 		access_level = "Delete"
 		group_id = "${vinyldns_group.test_group.id}"
-		record_types = ["TXT"]
 	}
 	depends_on = [
 		"vinyldns_group.test_group"
