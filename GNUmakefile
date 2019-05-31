@@ -31,7 +31,7 @@ stop-api:
 # See `start-api` for a convenience task in doing so.
 test:
 	go vet
-	go test -cover
+	go test ${SOURCE} -v -cover
 	VINYLDNS_ACCESS_KEY=okAccessKey \
 		VINYLDNS_SECRET_KEY=okSecretKey \
 		VINYLDNS_HOST=http://localhost:9000 \

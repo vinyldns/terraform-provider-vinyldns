@@ -17,6 +17,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
@@ -46,8 +47,22 @@ func resourceVinylDNSGroup() *schema.Resource {
 				Optional: true,
 				Default:  "Managed by Terraform",
 			},
-			"member": userSchema(),
-			"admin":  userSchema(),
+			"member_ids": &schema.Schema{
+				Type:     schema.TypeSet,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set: func(v interface{}) int {
+					return hashcode.String(v.(string))
+				},
+			},
+			"admin_ids": &schema.Schema{
+				Type:     schema.TypeSet,
+				Required: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set: func(v interface{}) int {
+					return hashcode.String(v.(string))
+				},
+			},
 		},
 	}
 }
@@ -59,8 +74,8 @@ func resourceVinylDNSGroupCreate(d *schema.ResourceData, meta interface{}) error
 		Name:        d.Get("name").(string),
 		Email:       d.Get("email").(string),
 		Description: d.Get("description").(string),
-		Members:     users("member", d),
-		Admins:      users("admin", d),
+		Members:     users("member_ids", d),
+		Admins:      users("admin_ids", d),
 	})
 	if err != nil {
 		return err
@@ -93,20 +108,23 @@ func resourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("name", g.Name)
 	d.Set("email", g.Email)
 	d.Set("description", g.Description)
-	if g.Members != nil {
-		mems := schemaUsers(g.Members)
 
-		if err := d.Set("member", mems); err != nil {
-			return fmt.Errorf("error setting member for group %s: %s", d.Id(), err)
-		}
+	memIDs := make([]interface{}, 0, len(g.Members))
+	for _, m := range g.Members {
+		memIDs = append(memIDs, m.ID)
 	}
 
-	if g.Admins != nil {
-		admins := schemaUsers(g.Admins)
+	if err := d.Set("member_ids", schema.NewSet(schema.HashString, memIDs)); err != nil {
+		return fmt.Errorf("error setting member_ids for group %s: %s", d.Id(), err)
+	}
 
-		if err := d.Set("admin", admins); err != nil {
-			return fmt.Errorf("error setting admin for group %s: %s", d.Id(), err)
-		}
+	adminIDs := make([]interface{}, 0, len(g.Admins))
+	for _, a := range g.Admins {
+		adminIDs = append(adminIDs, a.ID)
+	}
+
+	if err := d.Set("admin_ids", schema.NewSet(schema.HashString, adminIDs)); err != nil {
+		return fmt.Errorf("error setting admin_ids for group %s: %s", d.Id(), err)
 	}
 
 	return nil
@@ -119,8 +137,8 @@ func resourceVinylDNSGroupUpdate(d *schema.ResourceData, meta interface{}) error
 		Name:        d.Get("name").(string),
 		Email:       d.Get("email").(string),
 		Description: d.Get("description").(string),
-		Members:     users("member", d),
-		Admins:      users("admin", d),
+		Members:     users("member_ids", d),
+		Admins:      users("admin_ids", d),
 	})
 	if err != nil {
 		return err
@@ -150,79 +168,16 @@ func resourceVinylDNSGroupDelete(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func userSchema() *schema.Schema {
-	return &schema.Schema{
-		Type:     schema.TypeSet,
-		Optional: true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"user_name": &schema.Schema{
-					Type:     schema.TypeString,
-					Optional: true,
-				},
-				"first_name": &schema.Schema{
-					Type:     schema.TypeString,
-					Optional: true,
-				},
-				"last_name": &schema.Schema{
-					Type:     schema.TypeString,
-					Optional: true,
-				},
-				"email": &schema.Schema{
-					Type:     schema.TypeString,
-					Optional: true,
-				},
-				"created": &schema.Schema{
-					Type:     schema.TypeString,
-					Computed: true,
-				},
-				"id": &schema.Schema{
-					Type:     schema.TypeString,
-					Required: true,
-				},
-			},
-		},
-	}
-}
-
 func users(userType string, d *schema.ResourceData) []vinyldns.User {
+	resourceUsers := stringSetToStringSlice(d.Get(userType).(*schema.Set))
 	users := []vinyldns.User{}
+	count := len(resourceUsers)
 
-	if u, ok := d.GetOk(userType); ok {
-		schemaUsers := u.(*schema.Set).List()
-
-		for _, user := range schemaUsers {
-			u := user.(map[string]interface{})
-
-			users = append(users, vinyldns.User{
-				UserName:  u["user_name"].(string),
-				FirstName: u["first_name"].(string),
-				LastName:  u["last_name"].(string),
-				Email:     u["email"].(string),
-				Created:   u["created"].(string),
-				ID:        u["id"].(string),
-			})
-		}
+	for i := 0; i < count; i++ {
+		users = append(users, vinyldns.User{
+			ID: resourceUsers[i],
+		})
 	}
 
 	return users
-}
-
-func schemaUsers(users []vinyldns.User) []map[string]interface{} {
-	var saves []map[string]interface{}
-
-	for _, user := range users {
-		u := make(map[string]interface{})
-
-		u["user_name"] = user.UserName
-		u["first_name"] = user.FirstName
-		u["last_name"] = user.LastName
-		u["email"] = user.Email
-		u["created"] = user.Created
-		u["id"] = user.ID
-
-		saves = append(saves, u)
-	}
-
-	return saves
 }

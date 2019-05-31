@@ -311,12 +311,8 @@ resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	description = "some description"
 	email = "tftest@tf.com"
-	member {
-	  id = "ok"
-	}
-	admin {
-	  id = "ok"
-	}
+	member_ids = ["ok"]
+	admin_ids = ["ok"]
 }
 
 resource "vinyldns_zone" "test_zone" {
@@ -379,12 +375,8 @@ resource "vinyldns_group" "test_group" {
 	name = "terraformtestgrouptwo"
 	description = "some description"
 	email = "tftest@tf.com"
-	member {
-	  id = "ok"
-	}
-	admin {
-	  id = "ok"
-	}
+	member_ids = ["ok"]
+	admin_ids = ["ok"]
 }
 
 resource "vinyldns_zone" "test_zone_1" {

@@ -311,17 +311,6 @@ func nsRecordSets(nsdnames []string) []vinyldns.Record {
 	return records
 }
 
-func stringSetToStringSlice(stringSet *schema.Set) []string {
-	ret := []string{}
-	if stringSet == nil {
-		return ret
-	}
-	for _, envVal := range stringSet.List() {
-		ret = append(ret, envVal.(string))
-	}
-	return ret
-}
-
 func waitUntilRecordSetDeployed(d *schema.ResourceData, meta interface{}, changeID string) error {
 	stateConf := &resource.StateChangeConf{
 		Pending:      []string{"Pending", ""},
@@ -364,15 +353,4 @@ func recordSetStateRefreshFunc(d *schema.ResourceData, meta interface{}, changeI
 
 		return rsc, rsc.Status, nil
 	}
-}
-
-// vinyldns responds 400 to IPv6 addresses represented within `[` `]`
-func removeBrackets(str string) string {
-	return strings.Replace(strings.Replace(str, "[", "", -1), "]", "", -1)
-}
-
-func parseTwoPartID(id string) (string, string) {
-	parts := strings.Split(id, ":")
-
-	return parts[0], parts[1]
 }
