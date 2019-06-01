@@ -91,7 +91,9 @@ func resourceVinylDNSZone() *schema.Resource {
 						"record_types": &schema.Schema{
 							Type:     schema.TypeSet,
 							Optional: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
 						},
 					},
 				},
@@ -454,7 +456,7 @@ func aclRecordTypes(rt *schema.Set) []string {
 }
 
 func buildACLRules(rules *vinyldns.ZoneACL) []map[string]interface{} {
-	var saves []map[string]interface{}
+	saves := []map[string]interface{}{}
 
 	for _, rule := range rules.Rules {
 		saves = append(saves, buildACLRule(rule))
@@ -472,7 +474,7 @@ func buildACLRule(rule vinyldns.ACLRule) map[string]interface{} {
 	r["group_id"] = rule.GroupID
 	r["record_mask"] = rule.RecordMask
 
-	rTypes := []string{}
+	rTypes := make([]string, 0, len(rule.RecordTypes))
 	for _, rt := range rule.RecordTypes {
 		rTypes = append(rTypes, rt)
 	}

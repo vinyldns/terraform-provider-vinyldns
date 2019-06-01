@@ -245,6 +245,7 @@ resource "vinyldns_zone" "test_zone" {
 	acl_rule {
 		access_level = "Delete"
 		group_id = "${vinyldns_group.test_group.id}"
+		record_types = ["TXT"]
 	}
 	depends_on = [
 		"vinyldns_group.test_group"
