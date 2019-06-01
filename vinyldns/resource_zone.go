@@ -149,7 +149,7 @@ func resourceVinylDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("created", zone.Created)
 
 	if zone.ACL != nil {
-		acls := schemaACLRules(zone.ACL)
+		acls := buildACLRules(zone.ACL)
 
 		if err := d.Set("acl_rule", acls); err != nil {
 			return fmt.Errorf("error setting ACL rule for zone %s: %s", d.Id(), err)
@@ -391,7 +391,6 @@ func zone(d *schema.ResourceData) *vinyldns.Zone {
 		Name:         d.Get("name").(string),
 		Email:        d.Get("email").(string),
 		AdminGroupID: d.Get("admin_group_id").(string),
-
 		ACL: &vinyldns.ZoneACL{
 			Rules: aclRules(d),
 		},
@@ -432,7 +431,7 @@ func aclRules(d *schema.ResourceData) []vinyldns.ACLRule {
 				UserID:      r["user_id"].(string),
 				GroupID:     r["group_id"].(string),
 				RecordMask:  r["record_mask"].(string),
-				//RecordTypes: aclRecordTypes(r["record_types"].(*schema.Set)),
+				RecordTypes: aclRecordTypes(r["record_types"].(*schema.Set)),
 			})
 		}
 	}
@@ -454,21 +453,32 @@ func aclRecordTypes(rt *schema.Set) []string {
 	return types
 }
 
-func schemaACLRules(rules *vinyldns.ZoneACL) []map[string]interface{} {
+func buildACLRules(rules *vinyldns.ZoneACL) []map[string]interface{} {
 	var saves []map[string]interface{}
 
 	for _, rule := range rules.Rules {
-		r := make(map[string]interface{})
-
-		r["access_level"] = rule.AccessLevel
-		r["description"] = rule.Description
-		r["user_id"] = rule.UserID
-		r["group_id"] = rule.GroupID
-		r["record_mask"] = rule.RecordMask
-		//r["record_types"] = rule.RecordTypes
-
-		saves = append(saves, r)
+		saves = append(saves, buildACLRule(rule))
 	}
 
 	return saves
+}
+
+func buildACLRule(rule vinyldns.ACLRule) map[string]interface{} {
+	r := map[string]interface{}{}
+
+	r["access_level"] = rule.AccessLevel
+	r["description"] = rule.Description
+	r["user_id"] = rule.UserID
+	r["group_id"] = rule.GroupID
+	r["record_mask"] = rule.RecordMask
+
+	rTypes := []string{}
+	for _, rt := range rule.RecordTypes {
+		rTypes = append(rTypes, rt)
+	}
+	if len(rTypes) > 0 {
+		r["record_types"] = rTypes
+	}
+
+	return r
 }
