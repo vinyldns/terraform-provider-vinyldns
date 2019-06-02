@@ -38,6 +38,8 @@ The following arguments are supported:
 
 * `zone_id` - (Required) The ID for the record set's zone.
 
+* `owner_group_id` - (Optional) Record ownership assignment. This is applicable if the recordset exists in a shared zone.
+
 * `type` - (Required) The type of DNS record.
 
 * `ttl` - (Optional) The DNS record set's TTL, or time to live.
@@ -49,9 +51,3 @@ The following arguments are supported:
 * `record_nsdnames` - (Optional) If the record is an NS record, a list of the record set's nsdname values.
 
 * `record_cname` - (Optional) If the record is a CNAME, the record's value.
-
-## Attributes Reference
-
-The following attributes are exported:
-
-* `account` - The account that created the record set. Note that this is deprecated in VinylDNS and will be removed.
