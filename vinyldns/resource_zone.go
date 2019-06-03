@@ -60,6 +60,14 @@ func resourceVinylDNSZone() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"updated": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"latest_sync": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"transfer_connection": connectionSchema(),
 			"zone_connection":     connectionSchema(),
 			"acl_rule": &schema.Schema{
@@ -149,6 +157,8 @@ func resourceVinylDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("status", zone.Status)
 	d.Set("shared", zone.Shared)
 	d.Set("created", zone.Created)
+	d.Set("updated", zone.Updated)
+	d.Set("latest_sync", zone.LatestSync)
 
 	if zone.ACL != nil {
 		acls := buildACLRules(zone.ACL)

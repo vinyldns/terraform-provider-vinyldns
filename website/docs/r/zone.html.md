@@ -74,3 +74,7 @@ The following attributes are exported:
 * `status` - The zone status.
 
 * `created` - The time when the zone was first created.
+
+* `updated` - The time when the zone was last updated.
+
+* `latest_sync` - The time when the zone was synced.
