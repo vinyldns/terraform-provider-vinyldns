@@ -198,11 +198,9 @@ func testAccCheckVinylDNSZoneWithACLExists(n, email string) resource.TestCheckFu
 			return fmt.Errorf("Expected Zone %s ACL rule AccessLevel to be 'Delete'; got %s", "system-test.", acl.AccessLevel)
 		}
 
-		/*
-			if acl.RecordTypes[0] != "TXT" {
-				return fmt.Errorf("Expected Zone %s ACL rule RecordTypes to include 'TXT'; got %s", "system-test.", acl.RecordTypes[0])
-			}
-		*/
+		if acl.RecordTypes[0] != "TXT" {
+			return fmt.Errorf("Expected Zone %s ACL rule RecordTypes to include 'TXT'; got %s", "system-test.", acl.RecordTypes[0])
+		}
 
 		return nil
 	}

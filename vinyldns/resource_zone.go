@@ -474,13 +474,20 @@ func buildACLRule(rule vinyldns.ACLRule) map[string]interface{} {
 	r["group_id"] = rule.GroupID
 	r["record_mask"] = rule.RecordMask
 
-	rTypes := make([]string, 0, len(rule.RecordTypes))
+	if len(rule.RecordTypes) <= 0 {
+		return r
+	}
+
+	raw, ok := r["record_types"]
+	if !ok {
+		raw = schema.NewSet(schema.HashString, nil)
+	}
+
+	list := raw.(*schema.Set)
 	for _, rt := range rule.RecordTypes {
-		rTypes = append(rTypes, rt)
+		list.Add(rt)
 	}
-	if len(rTypes) > 0 {
-		r["record_types"] = rTypes
-	}
+	r["record_types"] = list
 
 	return r
 }
