@@ -61,17 +61,17 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 		CheckDestroy: testAccVinylDNSZoneDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigWithACL("email@foo.com"),
+				Config: testAccVinylDNSZoneConfigWithACL("email@foo.com", "TXT"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", "email@foo.com"),
+					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", "email@foo.com", "TXT"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "email@foo.com"),
 				),
 			},
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigWithACL("updated_email@foo.com"),
+				Config: testAccVinylDNSZoneConfigWithACL("updated_email@foo.com", "A"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", "updated_email@foo.com"),
+					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", "updated_email@foo.com", "A"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "updated_email@foo.com"),
 				),
@@ -161,7 +161,7 @@ func testAccCheckVinylDNSZoneBasicExists(n, email string) resource.TestCheckFunc
 	}
 }
 
-func testAccCheckVinylDNSZoneWithACLExists(n, email string) resource.TestCheckFunc {
+func testAccCheckVinylDNSZoneWithACLExists(n, email, recType string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -198,7 +198,7 @@ func testAccCheckVinylDNSZoneWithACLExists(n, email string) resource.TestCheckFu
 			return fmt.Errorf("Expected Zone %s ACL rule AccessLevel to be 'Delete'; got %s", "system-test.", acl.AccessLevel)
 		}
 
-		if acl.RecordTypes[0] != "TXT" {
+		if acl.RecordTypes[0] != recType {
 			return fmt.Errorf("Expected Zone %s ACL rule RecordTypes to include 'TXT'; got %s", "system-test.", acl.RecordTypes[0])
 		}
 
@@ -227,7 +227,7 @@ resource "vinyldns_zone" "test_zone" {
 	return fmt.Sprintf(t, email)
 }
 
-func testAccVinylDNSZoneConfigWithACL(email string) string {
+func testAccVinylDNSZoneConfigWithACL(email, rTypes string) string {
 	const t = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
@@ -243,12 +243,12 @@ resource "vinyldns_zone" "test_zone" {
 	acl_rule {
 		access_level = "Delete"
 		group_id = "${vinyldns_group.test_group.id}"
-		record_types = ["TXT"]
+		record_types = ["%s"]
 	}
 	depends_on = [
 		"vinyldns_group.test_group"
 	]
 }`
 
-	return fmt.Sprintf(t, email)
+	return fmt.Sprintf(t, email, rTypes)
 }
