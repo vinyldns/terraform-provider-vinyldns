@@ -179,6 +179,10 @@ func testAccVinylDNSZoneImportStateCheck(s []*terraform.InstanceState) error {
 		return fmt.Errorf("expected email attribute to be %s, received %s", expEmail, email)
 	}
 
+	if rs.Attributes["admin_group_id"] == "" {
+		return fmt.Errorf("expected admin_group_id attribute to have value")
+	}
+
 	return nil
 }
 
