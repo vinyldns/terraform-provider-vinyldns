@@ -86,6 +86,38 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 	})
 }
 
+func TestAccVinylDNSZoneWithConnection(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccVinylDNSZoneDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccVinylDNSZoneConfigWithConnection("email@foo.com"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVinylDNSZoneWithConnectionExists("vinyldns_zone.test_zone", "email@foo.com"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "email@foo.com"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccVinylDNSZoneConfigWithConnection("updated_email@foo.com"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckVinylDNSZoneWithConnectionExists("vinyldns_zone.test_zone", "updated_email@foo.com"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "updated_email@foo.com"),
+				),
+			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_zone.test_zone",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSZoneImportStateCheck,
+			},
+		},
+	})
+}
+
 func testAccVinylDNSZoneImportStateCheck(s []*terraform.InstanceState) error {
 	if len(s) != 1 {
 		return fmt.Errorf("expected 1 state: %#v", s)
@@ -206,6 +238,53 @@ func testAccCheckVinylDNSZoneWithACLExists(n, email, recType string) resource.Te
 	}
 }
 
+func testAccCheckVinylDNSZoneWithConnectionExists(n, email string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return fmt.Errorf("Not found %s", rs)
+		}
+		log.Printf("[INFO] testing that zone exists: %s", rs.Primary.ID)
+
+		if rs.Primary.ID == "" {
+			return fmt.Errorf("No Zone ID is set")
+		}
+
+		client := testAccProvider.Meta().(*vinyldns.Client)
+
+		readZone, err := client.Zone(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+
+		if readZone.Name != "system-test." {
+			return fmt.Errorf("Zone %s not found", "system-test.")
+		}
+
+		if readZone.Email != email {
+			return fmt.Errorf("Zone %s with email %s not found", "system-test.", email)
+		}
+
+		if readZone.Connection.Name != zConName {
+			return fmt.Errorf("Zone %s with connection name %s not found", "system-test.", zConName)
+		}
+
+		if readZone.Connection.KeyName != zConKeyName {
+			return fmt.Errorf("Zone %s with connection key name %s not found", "system-test.", zConKeyName)
+		}
+
+		if readZone.Connection.Key != zConKey {
+			return fmt.Errorf("Zone %s with connection key %s not found", "system-test.", zConKey)
+		}
+
+		if readZone.Connection.PrimaryServer != zConPrimaryServer {
+			return fmt.Errorf("Zone %s with connection primary server %s not found", "system-test.", zConPrimaryServer)
+		}
+
+		return nil
+	}
+}
+
 func testAccVinylDNSZoneConfigBasic(email string) string {
 	const t = `
 resource "vinyldns_group" "test_group" {
@@ -251,4 +330,38 @@ resource "vinyldns_zone" "test_zone" {
 }`
 
 	return fmt.Sprintf(t, email, rTypes)
+}
+
+const (
+	zConName          = "vinyldns."
+	zConKey           = "nzisn+4G2ldMn0q1CV3vsg=="
+	zConKeyName       = "vinyldns."
+	zConPrimaryServer = "vinyldns-bind9"
+)
+
+func testAccVinylDNSZoneConfigWithConnection(email string) string {
+	const t = `
+resource "vinyldns_group" "test_group" {
+	name = "terraformtestgroup"
+	email = "tftest@tf.com"
+	member_ids = ["ok"]
+	admin_ids = ["ok"]
+}
+
+resource "vinyldns_zone" "test_zone" {
+	name = "system-test."
+	email = "%s"
+	admin_group_id = "${vinyldns_group.test_group.id}"
+	zone_connection {
+		name = "%s"
+		key = "%s"
+		key_name = "%s"
+		primary_server = "%s"
+	}
+	depends_on = [
+		"vinyldns_group.test_group"
+	]
+}`
+
+	return fmt.Sprintf(t, email, zConName, zConKey, zConKeyName, zConPrimaryServer)
 }
