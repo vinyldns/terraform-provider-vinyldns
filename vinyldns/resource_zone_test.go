@@ -22,6 +22,16 @@ import (
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
+const (
+	zName             = "system-test."
+	zEmail            = "email@foo.com"
+	zEmailUpdated     = "updated_email@foo.com"
+	zConName          = "vinyldns."
+	zConKey           = "nzisn+4G2ldMn0q1CV3vsg=="
+	zConKeyName       = "vinyldns."
+	zConPrimaryServer = "vinyldns-bind9"
+)
+
 func TestAccVinylDNSZoneBasic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -29,19 +39,19 @@ func TestAccVinylDNSZoneBasic(t *testing.T) {
 		CheckDestroy: testAccVinylDNSZoneDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigBasic("email@foo.com"),
+				Config: testAccVinylDNSZoneConfigBasic(zEmail),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneBasicExists("vinyldns_zone.test_zone", "email@foo.com"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "email@foo.com"),
+					testAccCheckVinylDNSZoneBasicExists("vinyldns_zone.test_zone", zEmail),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
 				),
 			},
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigBasic("updated_email@foo.com"),
+				Config: testAccVinylDNSZoneConfigBasic(zEmailUpdated),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneBasicExists("vinyldns_zone.test_zone", "updated_email@foo.com"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "updated_email@foo.com"),
+					testAccCheckVinylDNSZoneBasicExists("vinyldns_zone.test_zone", zEmailUpdated),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmailUpdated),
 				),
 			},
 			resource.TestStep{
@@ -61,19 +71,19 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 		CheckDestroy: testAccVinylDNSZoneDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigWithACL("email@foo.com", "TXT"),
+				Config: testAccVinylDNSZoneConfigWithACL(zEmail, "TXT"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", "email@foo.com", "TXT"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "email@foo.com"),
+					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", zEmail, "TXT"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
 				),
 			},
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigWithACL("updated_email@foo.com", "A"),
+				Config: testAccVinylDNSZoneConfigWithACL(zEmailUpdated, "A"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", "updated_email@foo.com", "A"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "updated_email@foo.com"),
+					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", zEmailUpdated, "A"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmailUpdated),
 				),
 			},
 			resource.TestStep{
@@ -93,19 +103,19 @@ func TestAccVinylDNSZoneWithConnection(t *testing.T) {
 		CheckDestroy: testAccVinylDNSZoneDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigWithConnection("email@foo.com"),
+				Config: testAccVinylDNSZoneConfigWithConnection(zEmail),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneWithConnectionExists("vinyldns_zone.test_zone", "email@foo.com"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "email@foo.com"),
+					testAccCheckVinylDNSZoneWithConnectionExists("vinyldns_zone.test_zone", zEmail),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
 				),
 			},
 			resource.TestStep{
-				Config: testAccVinylDNSZoneConfigWithConnection("updated_email@foo.com"),
+				Config: testAccVinylDNSZoneConfigWithConnection(zEmailUpdated),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckVinylDNSZoneWithConnectionExists("vinyldns_zone.test_zone", "updated_email@foo.com"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", "system-test."),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", "updated_email@foo.com"),
+					testAccCheckVinylDNSZoneWithConnectionExists("vinyldns_zone.test_zone", zEmailUpdated),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmailUpdated),
 				),
 			},
 			resource.TestStep{
@@ -125,13 +135,13 @@ func testAccVinylDNSZoneImportStateCheck(s []*terraform.InstanceState) error {
 
 	rs := s[0]
 
-	expName := "system-test."
+	expName := zName
 	name := rs.Attributes["name"]
-	if name != expName {
+	if name != zName {
 		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
 	}
 
-	expEmail := "updated_email@foo.com"
+	expEmail := zEmailUpdated
 	email := rs.Attributes["email"]
 	if email != expEmail {
 		return fmt.Errorf("expected email attribute to be %s, received %s", expEmail, email)
@@ -181,12 +191,12 @@ func testAccCheckVinylDNSZoneBasicExists(n, email string) resource.TestCheckFunc
 			return err
 		}
 
-		if readZone.Name != "system-test." {
-			return fmt.Errorf("Zone %s not found", "system-test.")
+		if readZone.Name != zName {
+			return fmt.Errorf("Zone %s not found", zName)
 		}
 
 		if readZone.Email != email {
-			return fmt.Errorf("Zone %s with email %s not found", "system-test.", email)
+			return fmt.Errorf("Zone %s with email %s not found", zName, email)
 		}
 
 		return nil
@@ -212,26 +222,26 @@ func testAccCheckVinylDNSZoneWithACLExists(n, email, recType string) resource.Te
 			return err
 		}
 
-		if readZone.Name != "system-test." {
-			return fmt.Errorf("Zone %s not found", "system-test.")
+		if readZone.Name != zName {
+			return fmt.Errorf("Zone %s not found", zName)
 		}
 
 		if readZone.Email != email {
-			return fmt.Errorf("Zone %s with email %s not found", "system-test.", email)
+			return fmt.Errorf("Zone %s with email %s not found", zName, email)
 		}
 
 		acl := readZone.ACL.Rules[0]
 
 		if acl.GroupID == "" {
-			return fmt.Errorf("Zone %s ACL rule has an empty GroupID", "system-test.")
+			return fmt.Errorf("Zone %s ACL rule has an empty GroupID", zName)
 		}
 
 		if acl.AccessLevel != "Delete" {
-			return fmt.Errorf("Expected Zone %s ACL rule AccessLevel to be 'Delete'; got %s", "system-test.", acl.AccessLevel)
+			return fmt.Errorf("Expected Zone %s ACL rule AccessLevel to be 'Delete'; got %s", zName, acl.AccessLevel)
 		}
 
 		if acl.RecordTypes[0] != recType {
-			return fmt.Errorf("Expected Zone %s ACL rule RecordTypes to include 'TXT'; got %s", "system-test.", acl.RecordTypes[0])
+			return fmt.Errorf("Expected Zone %s ACL rule RecordTypes to include 'TXT'; got %s", zName, acl.RecordTypes[0])
 		}
 
 		return nil
@@ -257,28 +267,28 @@ func testAccCheckVinylDNSZoneWithConnectionExists(n, email string) resource.Test
 			return err
 		}
 
-		if readZone.Name != "system-test." {
-			return fmt.Errorf("Zone %s not found", "system-test.")
+		if readZone.Name != zName {
+			return fmt.Errorf("Zone %s not found", zName)
 		}
 
 		if readZone.Email != email {
-			return fmt.Errorf("Zone %s with email %s not found", "system-test.", email)
+			return fmt.Errorf("Zone %s with email %s not found", zName, email)
 		}
 
 		if readZone.Connection.Name != zConName {
-			return fmt.Errorf("Zone %s with connection name %s not found", "system-test.", zConName)
+			return fmt.Errorf("Zone %s with connection name %s not found", zName, zConName)
 		}
 
 		if readZone.Connection.KeyName != zConKeyName {
-			return fmt.Errorf("Zone %s with connection key name %s not found", "system-test.", zConKeyName)
+			return fmt.Errorf("Zone %s with connection key name %s not found", zName, zConKeyName)
 		}
 
 		if readZone.Connection.Key != zConKey {
-			return fmt.Errorf("Zone %s with connection key %s not found", "system-test.", zConKey)
+			return fmt.Errorf("Zone %s with connection key %s not found", zName, zConKey)
 		}
 
 		if readZone.Connection.PrimaryServer != zConPrimaryServer {
-			return fmt.Errorf("Zone %s with connection primary server %s not found", "system-test.", zConPrimaryServer)
+			return fmt.Errorf("Zone %s with connection primary server %s not found", zName, zConPrimaryServer)
 		}
 
 		return nil
@@ -316,7 +326,7 @@ resource "vinyldns_group" "test_group" {
 }
 
 resource "vinyldns_zone" "test_zone" {
-	name = "system-test."
+	name = "%s"
 	email = "%s"
 	admin_group_id = "${vinyldns_group.test_group.id}"
 	acl_rule {
@@ -329,15 +339,8 @@ resource "vinyldns_zone" "test_zone" {
 	]
 }`
 
-	return fmt.Sprintf(t, email, rTypes)
+	return fmt.Sprintf(t, zName, email, rTypes)
 }
-
-const (
-	zConName          = "vinyldns."
-	zConKey           = "nzisn+4G2ldMn0q1CV3vsg=="
-	zConKeyName       = "vinyldns."
-	zConPrimaryServer = "vinyldns-bind9"
-)
 
 func testAccVinylDNSZoneConfigWithConnection(email string) string {
 	const t = `
@@ -349,7 +352,7 @@ resource "vinyldns_group" "test_group" {
 }
 
 resource "vinyldns_zone" "test_zone" {
-	name = "system-test."
+	name = "%s"
 	email = "%s"
 	admin_group_id = "${vinyldns_group.test_group.id}"
 	zone_connection {
@@ -363,5 +366,5 @@ resource "vinyldns_zone" "test_zone" {
 	]
 }`
 
-	return fmt.Sprintf(t, email, zConName, zConKey, zConKeyName, zConPrimaryServer)
+	return fmt.Sprintf(t, zName, email, zConName, zConKey, zConKeyName, zConPrimaryServer)
 }
