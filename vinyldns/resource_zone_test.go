@@ -76,6 +76,8 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", zEmail, "TXT"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
+					// NOTE: why does this seemingly receive a different index with each test execution?
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "acl_rule.1878097405.access_level", "Delete"),
 				),
 			},
 			resource.TestStep{
@@ -225,20 +227,18 @@ func testAccVinylDNSZoneWithACLImportStateCheck(s []*terraform.InstanceState) er
 		return fmt.Errorf("expected admin_group_id attribute to have value")
 	}
 
-	//TODO: why does acl_rule get a different index each time?
+	// NOTE: why does acl_rule get a different index each time?
 	// According to Terraform docs, "items are stored in state with an index value calculated by the hash of the attributes of the set."
 	// https://www.terraform.io/docs/extend/schemas/schema-types.html
-	/*
-		accessLev := rs.Attributes["acl_rule.1878097405.access_level"]
-		if accessLev != "Delete" {
-			return fmt.Errorf("expected acl_rule attribute to have value; got %s", accessLev)
-		}
+	accessLev := rs.Attributes["acl_rule.1878097405.access_level"]
+	if accessLev != "Delete" {
+		return fmt.Errorf("expected acl_rule attribute to have value; got %s", accessLev)
+	}
 
-			recTypes := rs.Attributes["acl_rule.0.record_types.430998943"]
-			if recTypes != "A" {
-				return fmt.Errorf("expected acl_rule record_types attribute to have value; got %s", recTypes)
-			}
-	*/
+	recTypes := rs.Attributes["acl_rule.0.record_types.430998943"]
+	if recTypes != "A" {
+		return fmt.Errorf("expected acl_rule record_types attribute to have value; got %s", recTypes)
+	}
 
 	return nil
 }
