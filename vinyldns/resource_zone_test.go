@@ -90,7 +90,7 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 				ResourceName:      "vinyldns_zone.test_zone",
 				ImportState:       true,
 				ImportStateVerify: true,
-				ImportStateCheck:  testAccVinylDNSZoneImportStateCheck,
+				ImportStateCheck:  testAccVinylDNSZoneWithACLImportStateCheck,
 			},
 		},
 	})
@@ -108,6 +108,10 @@ func TestAccVinylDNSZoneWithConnection(t *testing.T) {
 					testAccCheckVinylDNSZoneWithConnectionExists("vinyldns_zone.test_zone", zEmail),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "zone_connection.0.name", zConName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "zone_connection.0.key", zConKey),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "zone_connection.0.key_name", zConKeyName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "zone_connection.0.primary_server", zConPrimaryServer),
 				),
 			},
 			resource.TestStep{
@@ -116,6 +120,10 @@ func TestAccVinylDNSZoneWithConnection(t *testing.T) {
 					testAccCheckVinylDNSZoneWithConnectionExists("vinyldns_zone.test_zone", zEmailUpdated),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmailUpdated),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "zone_connection.0.name", zConName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "zone_connection.0.key", zConKey),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "zone_connection.0.key_name", zConKeyName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "zone_connection.0.primary_server", zConPrimaryServer),
 				),
 			},
 			resource.TestStep{
@@ -140,6 +148,10 @@ func TestAccVinylDNSZoneWithTransferConnection(t *testing.T) {
 					testAccCheckVinylDNSZoneWithTransferConnectionExists("vinyldns_zone.test_zone", zEmail),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "transfer_connection.0.name", zConName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "transfer_connection.0.key", zConKey),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "transfer_connection.0.key_name", zConKeyName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "transfer_connection.0.primary_server", zConPrimaryServer),
 				),
 			},
 			resource.TestStep{
@@ -148,6 +160,10 @@ func TestAccVinylDNSZoneWithTransferConnection(t *testing.T) {
 					testAccCheckVinylDNSZoneWithTransferConnectionExists("vinyldns_zone.test_zone", zEmailUpdated),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmailUpdated),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "transfer_connection.0.name", zConName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "transfer_connection.0.key", zConKey),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "transfer_connection.0.key_name", zConKeyName),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "transfer_connection.0.primary_server", zConPrimaryServer),
 				),
 			},
 			resource.TestStep{
@@ -182,6 +198,47 @@ func testAccVinylDNSZoneImportStateCheck(s []*terraform.InstanceState) error {
 	if rs.Attributes["admin_group_id"] == "" {
 		return fmt.Errorf("expected admin_group_id attribute to have value")
 	}
+
+	return nil
+}
+
+func testAccVinylDNSZoneWithACLImportStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := zName
+	name := rs.Attributes["name"]
+	if name != zName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expEmail := zEmailUpdated
+	email := rs.Attributes["email"]
+	if email != expEmail {
+		return fmt.Errorf("expected email attribute to be %s, received %s", expEmail, email)
+	}
+
+	if rs.Attributes["admin_group_id"] == "" {
+		return fmt.Errorf("expected admin_group_id attribute to have value")
+	}
+
+	//TODO: why does acl_rule get a different index each time?
+	// According to Terraform docs, "items are stored in state with an index value calculated by the hash of the attributes of the set."
+	// https://www.terraform.io/docs/extend/schemas/schema-types.html
+	/*
+		accessLev := rs.Attributes["acl_rule.1878097405.access_level"]
+		if accessLev != "Delete" {
+			return fmt.Errorf("expected acl_rule attribute to have value; got %s", accessLev)
+		}
+
+			recTypes := rs.Attributes["acl_rule.0.record_types.430998943"]
+			if recTypes != "A" {
+				return fmt.Errorf("expected acl_rule record_types attribute to have value; got %s", recTypes)
+			}
+	*/
 
 	return nil
 }
@@ -245,6 +302,7 @@ func testAccCheckVinylDNSZoneWithACLExists(n, email, recType string) resource.Te
 		if !ok {
 			return fmt.Errorf("Not found %s", rs)
 		}
+
 		log.Printf("[INFO] testing that zone exists: %s", rs.Primary.ID)
 
 		if rs.Primary.ID == "" {
