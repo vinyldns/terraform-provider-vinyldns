@@ -74,3 +74,5 @@ The following attributes are exported:
 * `status` - The zone status.
 
 * `created` - The time when the zone was first created.
+
+* `shared` - A boolean flag indicating if the zone is a shared zone.
