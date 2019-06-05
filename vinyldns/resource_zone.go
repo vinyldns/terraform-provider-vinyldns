@@ -60,8 +60,52 @@ func resourceVinylDNSZone() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"updated": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"latest_sync": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"transfer_connection": connectionSchema(),
 			"zone_connection":     connectionSchema(),
+			"acl_rule": &schema.Schema{
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"access_level": &schema.Schema{
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"record_mask": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"user_id": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"group_id": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"description": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  "Managed by Terraform",
+						},
+						"record_types": &schema.Schema{
+							Type:     schema.TypeSet,
+							Optional: true,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -113,6 +157,16 @@ func resourceVinylDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("status", zone.Status)
 	d.Set("shared", zone.Shared)
 	d.Set("created", zone.Created)
+	d.Set("updated", zone.Updated)
+	d.Set("latest_sync", zone.LatestSync)
+
+	if zone.ACL != nil {
+		acls := buildACLRules(zone.ACL)
+
+		if err := d.Set("acl_rule", acls); err != nil {
+			return fmt.Errorf("error setting ACL rule for zone %s: %s", d.Id(), err)
+		}
+	}
 
 	if zone.Connection != nil {
 		d.Set("zone_connection", []interface{}{
@@ -349,6 +403,9 @@ func zone(d *schema.ResourceData) *vinyldns.Zone {
 		Name:         d.Get("name").(string),
 		Email:        d.Get("email").(string),
 		AdminGroupID: d.Get("admin_group_id").(string),
+		ACL: &vinyldns.ZoneACL{
+			Rules: aclRules(d),
+		},
 	}
 
 	if d.Id() != "" {
@@ -369,4 +426,78 @@ func zone(d *schema.ResourceData) *vinyldns.Zone {
 	}
 
 	return zone
+}
+
+func aclRules(d *schema.ResourceData) []vinyldns.ACLRule {
+	rules := []vinyldns.ACLRule{}
+
+	if r, ok := d.GetOk("acl_rule"); ok {
+		schemaRules := r.(*schema.Set).List()
+
+		for _, rule := range schemaRules {
+			r := rule.(map[string]interface{})
+
+			rules = append(rules, vinyldns.ACLRule{
+				AccessLevel: r["access_level"].(string),
+				Description: r["description"].(string),
+				UserID:      r["user_id"].(string),
+				GroupID:     r["group_id"].(string),
+				RecordMask:  r["record_mask"].(string),
+				RecordTypes: aclRecordTypes(r["record_types"].(*schema.Set)),
+			})
+		}
+	}
+
+	return rules
+}
+
+func aclRecordTypes(rt *schema.Set) []string {
+	rtList := rt.List()
+	types := []string{}
+	count := rt.Len()
+
+	for i := 0; i < count; i++ {
+		if str, ok := rtList[i].(string); ok {
+			types = append(types, str)
+		}
+	}
+
+	return types
+}
+
+func buildACLRules(rules *vinyldns.ZoneACL) []map[string]interface{} {
+	saves := []map[string]interface{}{}
+
+	for _, rule := range rules.Rules {
+		saves = append(saves, buildACLRule(rule))
+	}
+
+	return saves
+}
+
+func buildACLRule(rule vinyldns.ACLRule) map[string]interface{} {
+	r := map[string]interface{}{}
+
+	r["access_level"] = rule.AccessLevel
+	r["description"] = rule.Description
+	r["user_id"] = rule.UserID
+	r["group_id"] = rule.GroupID
+	r["record_mask"] = rule.RecordMask
+
+	if len(rule.RecordTypes) <= 0 {
+		return r
+	}
+
+	raw, ok := r["record_types"]
+	if !ok {
+		raw = schema.NewSet(schema.HashString, nil)
+	}
+
+	list := raw.(*schema.Set)
+	for _, rt := range rule.RecordTypes {
+		list.Add(rt)
+	}
+	r["record_types"] = list
+
+	return r
 }

@@ -436,12 +436,12 @@
   version = "v0.5.4"
 
 [[projects]]
-  digest = "1:19ff7220e5dcd236115d855688428d6671cc7e611566a43bd59d97a1dd2fb688"
+  digest = "1:bae69942a6b19d7788763c89a1f199248535d4af27293c47d9347af9bb29f292"
   name = "github.com/vinyldns/go-vinyldns"
   packages = ["vinyldns"]
   pruneopts = "UT"
-  revision = "0c6fa243f98b9a60127bef27c50badcf83c11682"
-  version = "0.9.3"
+  revision = "c359129add72bb1f07339392867bcc63741d70cd"
+  version = "0.9.4"
 
 [[projects]]
   branch = "master"
