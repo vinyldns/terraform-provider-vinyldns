@@ -32,7 +32,7 @@ const (
 	zConPrimaryServer              = "vinyldns-bind9"
 	zACLRuleHash                   = "4011566075"
 	zACLRuleUpdatedHash            = "4195916832"
-	zACLRuleRecordTypesHash        = ""
+	zACLRuleRecordTypesHash        = "1750616469"
 	zACLRuleRecordTypesUpdatedHash = "430998943"
 )
 
@@ -82,6 +82,7 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.access_level", zACLRuleHash), "Delete"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.user_id", zACLRuleHash), "ok"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.record_types.%s", zACLRuleHash, zACLRuleRecordTypesHash), "TXT"),
 				),
 			},
 			resource.TestStep{
@@ -236,12 +237,12 @@ func testAccVinylDNSZoneWithACLImportStateCheck(s []*terraform.InstanceState) er
 
 	accessLev := rs.Attributes[fmt.Sprintf("acl_rule.%s.access_level", zACLRuleUpdatedHash)]
 	if accessLev != "Delete" {
-		return fmt.Errorf("expected acl_rule access_level attribute to have value; got %s", rs.Attributes)
+		return fmt.Errorf("expected acl_rule access_level attribute to have value; got %s from state: %s", accessLev, rs.Attributes)
 	}
 
 	recTypes := rs.Attributes[fmt.Sprintf("acl_rule.%s.record_types.%s", zACLRuleUpdatedHash, zACLRuleRecordTypesUpdatedHash)]
 	if recTypes != "A" {
-		return fmt.Errorf("expected acl_rule record_types attribute to have value; got %s", recTypes)
+		return fmt.Errorf("expected acl_rule record_types attribute to be 'A'; got %s from state: %s", recTypes, rs.Attributes)
 	}
 
 	return nil
