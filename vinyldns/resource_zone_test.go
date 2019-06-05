@@ -23,13 +23,17 @@ import (
 )
 
 const (
-	zName             = "system-test."
-	zEmail            = "email@foo.com"
-	zEmailUpdated     = "updated_email@foo.com"
-	zConName          = "vinyldns."
-	zConKey           = "nzisn+4G2ldMn0q1CV3vsg=="
-	zConKeyName       = "vinyldns."
-	zConPrimaryServer = "vinyldns-bind9"
+	zName                          = "system-test."
+	zEmail                         = "email@foo.com"
+	zEmailUpdated                  = "updated_email@foo.com"
+	zConName                       = "vinyldns."
+	zConKey                        = "nzisn+4G2ldMn0q1CV3vsg=="
+	zConKeyName                    = "vinyldns."
+	zConPrimaryServer              = "vinyldns-bind9"
+	zACLRuleHash                   = "4011566075"
+	zACLRuleUpdatedHash            = "4195916832"
+	zACLRuleRecordTypesHash        = ""
+	zACLRuleRecordTypesUpdatedHash = "430998943"
 )
 
 func TestAccVinylDNSZoneBasic(t *testing.T) {
@@ -76,8 +80,8 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", zEmail, "TXT"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
-					// NOTE: why does this seemingly receive a different index with each test execution?
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "acl_rule.1878097405.access_level", "Delete"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.access_level", zACLRuleHash), "Delete"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.user_id", zACLRuleHash), "ok"),
 				),
 			},
 			resource.TestStep{
@@ -86,6 +90,9 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", zEmailUpdated, "A"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmailUpdated),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.access_level", zACLRuleUpdatedHash), "Delete"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.user_id", zACLRuleUpdatedHash), "ok"),
+					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.record_types.%s", zACLRuleUpdatedHash, zACLRuleRecordTypesUpdatedHash), "A"),
 				),
 			},
 			resource.TestStep{
@@ -227,15 +234,12 @@ func testAccVinylDNSZoneWithACLImportStateCheck(s []*terraform.InstanceState) er
 		return fmt.Errorf("expected admin_group_id attribute to have value")
 	}
 
-	// NOTE: why does acl_rule get a different index each time?
-	// According to Terraform docs, "items are stored in state with an index value calculated by the hash of the attributes of the set."
-	// https://www.terraform.io/docs/extend/schemas/schema-types.html
-	accessLev := rs.Attributes["acl_rule.1878097405.access_level"]
+	accessLev := rs.Attributes[fmt.Sprintf("acl_rule.%s.access_level", zACLRuleUpdatedHash)]
 	if accessLev != "Delete" {
-		return fmt.Errorf("expected acl_rule attribute to have value; got %s", accessLev)
+		return fmt.Errorf("expected acl_rule access_level attribute to have value; got %s", rs.Attributes)
 	}
 
-	recTypes := rs.Attributes["acl_rule.0.record_types.430998943"]
+	recTypes := rs.Attributes[fmt.Sprintf("acl_rule.%s.record_types.%s", zACLRuleUpdatedHash, zACLRuleRecordTypesUpdatedHash)]
 	if recTypes != "A" {
 		return fmt.Errorf("expected acl_rule record_types attribute to have value; got %s", recTypes)
 	}
@@ -326,8 +330,8 @@ func testAccCheckVinylDNSZoneWithACLExists(n, email, recType string) resource.Te
 
 		acl := readZone.ACL.Rules[0]
 
-		if acl.GroupID == "" {
-			return fmt.Errorf("Zone %s ACL rule has an empty GroupID", zName)
+		if acl.UserID != "ok" {
+			return fmt.Errorf("Zone %s ACL rule has incorrect UserID", zName)
 		}
 
 		if acl.AccessLevel != "Delete" {
@@ -472,7 +476,7 @@ resource "vinyldns_zone" "test_zone" {
 	admin_group_id = "${vinyldns_group.test_group.id}"
 	acl_rule {
 		access_level = "Delete"
-		group_id = "${vinyldns_group.test_group.id}"
+		user_id = "ok"
 		record_types = ["%s"]
 	}
 	depends_on = [
