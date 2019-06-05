@@ -78,3 +78,5 @@ The following attributes are exported:
 * `updated` - The time when the zone was last updated.
 
 * `latest_sync` - The time when the zone was synced.
+
+* `shared` - A boolean flag indicating if the zone is a shared zone.
