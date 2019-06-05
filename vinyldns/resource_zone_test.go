@@ -23,13 +23,17 @@ import (
 )
 
 const (
-	zName                          = "system-test."
-	zEmail                         = "email@foo.com"
-	zEmailUpdated                  = "updated_email@foo.com"
-	zConName                       = "vinyldns."
-	zConKey                        = "nzisn+4G2ldMn0q1CV3vsg=="
-	zConKeyName                    = "vinyldns."
-	zConPrimaryServer              = "vinyldns-bind9"
+	zName             = "system-test."
+	zEmail            = "email@foo.com"
+	zEmailUpdated     = "updated_email@foo.com"
+	zConName          = "vinyldns."
+	zConKey           = "nzisn+4G2ldMn0q1CV3vsg=="
+	zConKeyName       = "vinyldns."
+	zConPrimaryServer = "vinyldns-bind9"
+	// NOTE: If ever the test config HCL is changed, these zACLRule*Hash var
+	// values will change as well, as TypeSets are stored in state with an
+	// index value calculated by the hash of the attributes of the set.
+	// https://www.terraform.io/docs/extend/schemas/schema-types.html
 	zACLRuleHash                   = "4011566075"
 	zACLRuleUpdatedHash            = "4195916832"
 	zACLRuleRecordTypesHash        = "1750616469"
