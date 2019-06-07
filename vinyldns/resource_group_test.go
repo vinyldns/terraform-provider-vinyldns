@@ -34,6 +34,10 @@ func TestAccVinylDNSGroupBasic(t *testing.T) {
 					testAccCheckVinylDNSGroupExists("vinyldns_group.test_group", "description"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "name", "terraformtestgroup"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "description", "description"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "member_ids.#", "1"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "member_ids.2044517703", "ok"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "admin_ids.#", "1"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "admin_ids.2044517703", "ok"),
 				),
 			},
 			resource.TestStep{
@@ -42,6 +46,10 @@ func TestAccVinylDNSGroupBasic(t *testing.T) {
 					testAccCheckVinylDNSGroupExists("vinyldns_group.test_group", "updated description"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "name", "terraformtestgroup"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "description", "updated description"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "member_ids.#", "1"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "member_ids.2044517703", "ok"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "admin_ids.#", "1"),
+					resource.TestCheckResourceAttr("vinyldns_group.test_group", "admin_ids.2044517703", "ok"),
 				),
 			},
 			resource.TestStep{
