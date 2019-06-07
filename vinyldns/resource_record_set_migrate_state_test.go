@@ -18,7 +18,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-func TestVinylDNSRecordSetMigrateState(t *testing.T) {
+func TestVinylDNSRecordSetMigrateStateID(t *testing.T) {
 	cases := map[string]struct {
 		StateVersion int
 		ID           string
@@ -50,6 +50,50 @@ func TestVinylDNSRecordSetMigrateState(t *testing.T) {
 
 		if is.ID != tc.Expected {
 			t.Fatalf("bad VinylDNS RecordSet Migrate: %s\n\n expected: %s", is.ID, tc.Expected)
+		}
+	}
+}
+
+func TestVinylDNSRecordSetMigrateStateRecordTexts(t *testing.T) {
+	cases := map[string]struct {
+		StateVersion int
+		ID           string
+		Attributes   map[string]string
+		Expected     map[string]string
+		Meta         interface{}
+	}{
+		"v0_0": {
+			StateVersion: 0,
+			ID:           "id",
+			Attributes: map[string]string{
+				"zone_id":     "zone-id",
+				"record_text": "some-text",
+			},
+			Expected: map[string]string{
+				"record_texts.#":          "1",
+				"record_texts.3073014027": "some-text",
+			},
+		},
+	}
+
+	for tn, tc := range cases {
+		is := &terraform.InstanceState{
+			ID:         tc.ID,
+			Attributes: tc.Attributes,
+		}
+		is, err := resourceVinylDNSRecordSetMigrateState(
+			tc.StateVersion, is, tc.Meta)
+
+		if err != nil {
+			t.Fatalf("bad: %s, err: %#v", tn, err)
+		}
+
+		for k, v := range tc.Expected {
+			if is.Attributes[k] != v {
+				t.Fatalf(
+					"bad: %s\n\n expected: %#v -> %#v\n got: %#v -> %#v\n in: %#v",
+					tn, k, v, k, is.Attributes[k], is.Attributes)
+			}
 		}
 	}
 }

@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
 
@@ -37,8 +38,18 @@ func migrateVinylDNSRecordSetStateV0toV1(is *terraform.InstanceState) (*terrafor
 	}
 
 	log.Printf("[DEBUG] Attributes before migration for record set %s: %#v", is.ID, is.Attributes)
+
 	newID := is.Attributes["zone_id"] + ":" + is.ID
 	is.ID = newID
+
+	rText := is.Attributes["record_text"]
+	if rText != "" {
+		h := schema.HashString(rText)
+		is.Attributes["record_texts.#"] = "1"
+		is.Attributes[fmt.Sprintf("record_texts.%v", h)] = rText
+	}
+
 	log.Printf("[DEBUG] Attributes after migration: %#v, new id: %s", is.Attributes, newID)
+
 	return is, nil
 }
