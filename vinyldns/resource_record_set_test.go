@@ -36,6 +36,10 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "name", "terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "type", "A"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.#", "2"),
+					// NOTE: the following will fail if ever the record_addresses values change, as these indexes are hashes of 127.0.0.2 and 127.0.0.1, respectively
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.1321121298", "127.0.0.2"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.3619153832", "127.0.0.1"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "name", "cname-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "type", "CNAME"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "ttl", "6000"),
@@ -333,7 +337,7 @@ resource "vinyldns_record_set" "test_a_record_set" {
 	owner_group_id = "${vinyldns_group.test_group.id}"
 	type = "A"
 	ttl = 6000
-	record_addresses = ["127.0.0.1", "127.0.0.1"]
+	record_addresses = ["127.0.0.1", "127.0.0.2"]
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
