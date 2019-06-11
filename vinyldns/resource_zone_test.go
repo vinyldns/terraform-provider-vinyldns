@@ -273,7 +273,7 @@ func testAccVinylDNSZoneWithACLImportStateCheck(s []*terraform.InstanceState) er
 
 	accessLev := rs.Attributes[fmt.Sprintf("acl_rule.%s.access_level", zACLRuleUpdatedHash)]
 	if accessLev != "Delete" {
-		return fmt.Errorf("expected acl_rule access_level attribute to have value; got %s from state: %s", accessLev, rs.Attributes)
+		return fmt.Errorf("expected acl_rule access_level attribute to be 'Delete'; got %s from state: %s", accessLev, rs.Attributes)
 	}
 
 	recTypes := rs.Attributes[fmt.Sprintf("acl_rule.%s.record_types.%s", zACLRuleUpdatedHash, zACLRuleRecordTypesUpdatedHash)]
