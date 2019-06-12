@@ -36,12 +36,20 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "name", "terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "type", "A"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.#", "2"),
+					// NOTE: the following will fail if ever the record_addresses values change, as these indexes are hashes of 127.0.0.2 and 127.0.0.1, respectively
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.1321121298", "127.0.0.2"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.3619153832", "127.0.0.1"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "name", "cname-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "type", "CNAME"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "record_cname", "terraformtestrecordset.system-test."),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "name", "txt-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "type", "TXT"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "record_texts.#", "1"),
+					// NOTE: the following will fail if ever record_texts is something other than ["some-text"], as 3073014027 is a hash of some-text
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "record_texts.3073014027", "some-text"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "name", "ns-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "type", "NS"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "ttl", "6000"),
@@ -330,7 +338,7 @@ resource "vinyldns_record_set" "test_a_record_set" {
 	owner_group_id = "${vinyldns_group.test_group.id}"
 	type = "A"
 	ttl = 6000
-	record_addresses = ["127.0.0.1", "127.0.0.1"]
+	record_addresses = ["127.0.0.1", "127.0.0.2"]
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
@@ -352,7 +360,7 @@ resource "vinyldns_record_set" "test_txt_record_set" {
 	zone_id = "${vinyldns_zone.test_zone.id}"
 	type = "TXT"
 	ttl = 6000
-	record_texts = ["Lorem ipsum and all that jazz"]
+	record_texts = ["some-text"]
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
