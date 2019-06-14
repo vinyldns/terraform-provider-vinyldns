@@ -195,7 +195,7 @@ func resourceVinylDNSZoneRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceVinylDNSZoneUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] Updating vinyldns zone: %s", d.Id())
-	change, err := meta.(*vinyldns.Client).ZoneUpdate(d.Id(), zone(d))
+	change, err := meta.(*vinyldns.Client).ZoneUpdate(zone(d))
 	if err != nil {
 		return err
 	}
