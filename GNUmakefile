@@ -3,7 +3,7 @@ NAME=terraform-provider-vinyldns
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 VINYLDNS_REPO=github.com/vinyldns/vinyldns
 SOURCE=./...
-VERSION=0.9.0
+VERSION=0.9.1
 
 all: deps start-api test build stop-api
 deps-build: deps build
@@ -79,14 +79,14 @@ release: package
 	go get github.com/aktau/github-release
 	github-release release \
 		--user vinyldns \
-		--repo ${NAME} \
-		--target $(shell git rev-parse --abbrev-ref HEAD) \
-		--tag ${VERSION} \
+		--repo "${NAME}" \
+		--target "$(shell git rev-parse --abbrev-ref HEAD)" \
+		--tag "${VERSION}" \
 		--name "${VERSION}"
 	ls release/*.tgz | xargs -I FILE github-release upload \
 		--user vinyldns \
-		--repo ${NAME} \
-		--tag ${VERSION} \
+		--repo "${NAME}" \
+		--tag "${VERSION}" \
 		--name FILE \
 		--file FILE
 
