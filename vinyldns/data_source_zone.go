@@ -40,7 +40,7 @@ func dataSourceVinylDNSZoneRead(d *schema.ResourceData, meta interface{}) error 
 		return fmt.Errorf("%s must be provided", "name")
 	}
 
-	log.Printf("[DEBUG] Reading VinylDNS zone %s", name)
+	log.Printf("[INFO] Reading VinylDNS zone %s", name)
 
 	z, err := meta.(*vinyldns.Client).ZoneByName(name)
 	if err != nil {
