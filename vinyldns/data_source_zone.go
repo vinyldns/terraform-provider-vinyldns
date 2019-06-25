@@ -17,7 +17,6 @@ func dataSourceVinylDNSZone() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-
 			"admin_group_id": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -51,6 +50,7 @@ func dataSourceVinylDNSZoneRead(d *schema.ResourceData, meta interface{}) error 
 
 	d.Set("name", z.Name)
 	d.Set("email", z.Email)
+	d.Set("admin_group_id", z.AdminGroupID)
 
 	return nil
 }

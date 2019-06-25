@@ -22,6 +22,7 @@ func TestAccVinylDNSZoneDataSource_basic(t *testing.T) {
 				Config: testAccCheckVinylDNSZoneDataSourceConfig(name),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.vinyldns_zone.test", "name"),
+					resource.TestCheckResourceAttrSet("data.vinyldns_zone.test", "admin_group_id"),
 					resource.TestCheckResourceAttr("data.vinyldns_zone.test", "name", name),
 					resource.TestCheckResourceAttr("data.vinyldns_zone.test", "email", "foo@email.com"),
 				),
