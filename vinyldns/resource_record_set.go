@@ -76,6 +76,10 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"record_ptrdname": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -246,6 +250,14 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 	// SOA records are currently read-only and cannot be created, updated or deleted by vinyldns
 	if recordType == "soa" {
 		return []vinyldns.Record{}, errors.New(recordType + " records are not currently supported by vinyldns")
+	}
+
+	if recordType == "ptr" {
+		return []vinyldns.Record{
+			vinyldns.Record{
+				PTRDName: d.Get("record_ptrdname").(string),
+			},
+		}, nil
 	}
 
 	if recordType == "cname" {
