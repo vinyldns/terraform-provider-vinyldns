@@ -382,9 +382,13 @@ resource "vinyldns_record_set" "test_ns_record_set" {
 	]
 }
 
+data "vinyldns_zone" "arpa" {
+	name = "2.0.192.in-addr.arpa"
+}
+
 resource "vinyldns_record_set" "test_ptr_record_set" {
 	name = "ptr-terraformtestrecordset"
-	zone_id = "${vinyldns_zone.test_zone.id}"
+	zone_id = "${vinyldns_zone.arpa.id}"
 	type = "PTR"
 	ttl = 6000
 	record_ptrdname = "10"
