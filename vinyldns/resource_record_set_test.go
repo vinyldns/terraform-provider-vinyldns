@@ -387,7 +387,7 @@ resource "vinyldns_record_set" "test_ptr_record_set" {
 	zone_id = "${vinyldns_zone.test_zone.id}"
 	type = "PTR"
 	ttl = 6000
-	record_ptrdname = "${vinyldns_zone.test_zone.name}"
+	record_ptrdname = "0.0.0.0"
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
