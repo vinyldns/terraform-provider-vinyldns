@@ -50,4 +50,6 @@ The following arguments are supported:
 
 * `record_nsdnames` - (Optional) If the record is an NS record, a list of the record set's nsdname values.
 
+* `record_ptrdnames` - (Optional) If the record is a PTR record, a list of the record set's ptrdname values.
+
 * `record_cname` - (Optional) If the record is a CNAME, the record's value.
