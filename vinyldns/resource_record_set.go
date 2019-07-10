@@ -151,6 +151,12 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 		return nil
 	}
 
+	if recordType == "ptr" {
+		d.Set("record_ptrdname", rs.Records[0].PTRDName)
+
+		return nil
+	}
+
 	if recordType == "txt" {
 		recs := make([]interface{}, 0, len(rs.Records))
 

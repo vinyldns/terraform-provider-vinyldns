@@ -55,7 +55,8 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "name", "ns-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "type", "NS"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "ttl", "6000"),
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "name", "ptr-terraformtestrecordset"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "name", "10"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdname", "ptr.terraformtestrecordset."),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "type", "PTR"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "ttl", "6000"),
 				),
@@ -382,16 +383,21 @@ resource "vinyldns_record_set" "test_ns_record_set" {
 	]
 }
 
-data "vinyldns_zone" "arpa" {
-	name = "2.0.192.in-addr.arpa"
+resource "vinyldns_zone" "test_reverse_zone" {
+	name = "2.0.192.in-addr.arpa."
+	email = "foo@bar.com"
+	admin_group_id = "${vinyldns_group.test_group.id}"
+	depends_on = [
+		"vinyldns_group.test_group"
+	]
 }
 
 resource "vinyldns_record_set" "test_ptr_record_set" {
-	name = "ptr-terraformtestrecordset"
-	zone_id = "${vinyldns_zone.arpa.id}"
+	name = "10"
+	zone_id = "${vinyldns_zone.test_reverse_zone.id}"
 	type = "PTR"
 	ttl = 6000
-	record_ptrdname = "10"
+	record_ptrdname = "ptr.terraformtestrecordset."
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
