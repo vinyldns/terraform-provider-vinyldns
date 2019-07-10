@@ -271,7 +271,7 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 	}
 
 	if recordType == "ptr" {
-		return ptrRecordSets(stringSetToStringSlice(d.Get("record_ptrdnames").(*schema.Set))), nil
+		return ptrRecordSets(stringSetToStringSlice(d.Get("record_ptrdnames").(*schema.Set)))
 	}
 
 	if recordType == "cname" {
@@ -312,17 +312,23 @@ func addressRecordSets(addresses []string) []vinyldns.Record {
 	return records
 }
 
-func ptrRecordSets(ptrdNames []string) []vinyldns.Record {
+func ptrRecordSets(ptrdNames []string) ([]vinyldns.Record, error) {
 	records := []vinyldns.Record{}
 	recordsCount := len(ptrdNames)
 
 	for i := 0; i < recordsCount; i++ {
+		ptrdName := ptrdNames[i]
+
+		if string(ptrdName[len(ptrdName)-1:]) != "." {
+			return []vinyldns.Record{}, errors.New("record_ptrdnames value must end in trailing '.'")
+		}
+
 		records = append(records, vinyldns.Record{
 			PTRDName: ptrdNames[i],
 		})
 	}
 
-	return records
+	return records, nil
 }
 
 func txtRecordSets(texts []string) []vinyldns.Record {
