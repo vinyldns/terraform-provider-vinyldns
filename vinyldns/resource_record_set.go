@@ -72,11 +72,15 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
-			"record_cname": &schema.Schema{
-				Type:     schema.TypeString,
+			"record_ptrdnames": &schema.Schema{
+				Type:     schema.TypeSet,
 				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set: func(v interface{}) int {
+					return hashcode.String(v.(string))
+				},
 			},
-			"record_ptrdname": &schema.Schema{
+			"record_cname": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -152,7 +156,15 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if recordType == "ptr" {
-		d.Set("record_ptrdname", rs.Records[0].PTRDName)
+		recs := make([]interface{}, 0, len(rs.Records))
+
+		for _, r := range rs.Records {
+			recs = append(recs, r.PTRDName)
+		}
+
+		if err := d.Set("record_ptrdnames", schema.NewSet(schema.HashString, recs)); err != nil {
+			return fmt.Errorf("error setting record_ptrdnames for record set %s: %s", d.Id(), err)
+		}
 
 		return nil
 	}
@@ -259,11 +271,7 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 	}
 
 	if recordType == "ptr" {
-		return []vinyldns.Record{
-			vinyldns.Record{
-				PTRDName: d.Get("record_ptrdname").(string),
-			},
-		}, nil
+		return ptrRecordSets(stringSetToStringSlice(d.Get("record_ptrdnames").(*schema.Set))), nil
 	}
 
 	if recordType == "cname" {
@@ -298,6 +306,19 @@ func addressRecordSets(addresses []string) []vinyldns.Record {
 	for i := 0; i < recordsCount; i++ {
 		records = append(records, vinyldns.Record{
 			Address: removeBrackets(addresses[i]),
+		})
+	}
+
+	return records
+}
+
+func ptrRecordSets(ptrdNames []string) []vinyldns.Record {
+	records := []vinyldns.Record{}
+	recordsCount := len(ptrdNames)
+
+	for i := 0; i < recordsCount; i++ {
+		records = append(records, vinyldns.Record{
+			PTRDName: ptrdNames[i],
 		})
 	}
 

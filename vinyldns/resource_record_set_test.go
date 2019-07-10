@@ -56,7 +56,9 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "type", "NS"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "name", "10"),
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdname", "ptr.terraformtestrecordset."),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.#", "1"),
+					// NOTE: the following will fail if ever ptrd_names is something other than ["ptr.terraformtestrecordset."], as 3198432272 is a hash of ptr.terraformtestrecordset.
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.3198432272", "ptr.terraformtestrecordset."),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "type", "PTR"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "ttl", "6000"),
 				),
@@ -261,7 +263,7 @@ func testAccVinylDNSRecordSetImportPTRRecordStateCheck(s []*terraform.InstanceSt
 	}
 
 	expPTRDName := "ptr.terraformtestrecordset."
-	ptrdName := rs.Attributes["record_ptrdname"]
+	ptrdName := rs.Attributes["record_ptrdnames"]
 	if expPTRDName != expPTRDName {
 		return fmt.Errorf("expected record_ptrdname attribute to be %s, received %s", expPTRDName, ptrdName)
 	}
@@ -437,7 +439,7 @@ resource "vinyldns_record_set" "test_ptr_record_set" {
 	zone_id = "${vinyldns_zone.test_reverse_zone.id}"
 	type = "PTR"
 	ttl = 6000
-	record_ptrdname = "ptr.terraformtestrecordset."
+	record_ptrdnames = ["ptr.terraformtestrecordset."]
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
