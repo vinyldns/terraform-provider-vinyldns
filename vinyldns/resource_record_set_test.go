@@ -263,8 +263,8 @@ func testAccVinylDNSRecordSetImportPTRRecordStateCheck(s []*terraform.InstanceSt
 	}
 
 	expPTRDName := "ptr.terraformtestrecordset."
-	ptrdName := rs.Attributes["record_ptrdnames"]
-	if expPTRDName != expPTRDName {
+	ptrdName := rs.Attributes["record_ptrdnames.3198432272"]
+	if ptrdName != expPTRDName {
 		return fmt.Errorf("expected record_ptrdname attribute to be %s, received %s", expPTRDName, ptrdName)
 	}
 
