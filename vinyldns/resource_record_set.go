@@ -72,6 +72,14 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
+			"record_ptrdnames": &schema.Schema{
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set: func(v interface{}) int {
+					return hashcode.String(v.(string))
+				},
+			},
 			"record_cname": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -143,6 +151,20 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 
 	if recordType == "cname" {
 		d.Set("record_cname", rs.Records[0].CName)
+
+		return nil
+	}
+
+	if recordType == "ptr" {
+		recs := make([]interface{}, 0, len(rs.Records))
+
+		for _, r := range rs.Records {
+			recs = append(recs, r.PTRDName)
+		}
+
+		if err := d.Set("record_ptrdnames", schema.NewSet(schema.HashString, recs)); err != nil {
+			return fmt.Errorf("error setting record_ptrdnames for record set %s: %s", d.Id(), err)
+		}
 
 		return nil
 	}
@@ -248,6 +270,10 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 		return []vinyldns.Record{}, errors.New(recordType + " records are not currently supported by vinyldns")
 	}
 
+	if recordType == "ptr" {
+		return ptrRecordSets(stringSetToStringSlice(d.Get("record_ptrdnames").(*schema.Set)))
+	}
+
 	if recordType == "cname" {
 		cname := d.Get("record_cname").(string)
 
@@ -284,6 +310,25 @@ func addressRecordSets(addresses []string) []vinyldns.Record {
 	}
 
 	return records
+}
+
+func ptrRecordSets(ptrdNames []string) ([]vinyldns.Record, error) {
+	records := []vinyldns.Record{}
+	recordsCount := len(ptrdNames)
+
+	for i := 0; i < recordsCount; i++ {
+		ptrdName := ptrdNames[i]
+
+		if string(ptrdName[len(ptrdName)-1:]) != "." {
+			return []vinyldns.Record{}, errors.New("record_ptrdnames value must end in trailing '.'")
+		}
+
+		records = append(records, vinyldns.Record{
+			PTRDName: ptrdNames[i],
+		})
+	}
+
+	return records, nil
 }
 
 func txtRecordSets(texts []string) []vinyldns.Record {

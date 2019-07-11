@@ -33,6 +33,8 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_a_record_set"),
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_cname_record_set"),
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_txt_record_set"),
+					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_ns_record_set"),
+					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_ptr_record_set"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "name", "terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "type", "A"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "ttl", "6000"),
@@ -53,6 +55,12 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "name", "ns-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "type", "NS"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "ttl", "6000"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "name", "10"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.#", "1"),
+					// NOTE: the following will fail if ever ptrd_names is something other than ["ptr.terraformtestrecordset."], as 3198432272 is a hash of ptr.terraformtestrecordset.
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.3198432272", "ptr.terraformtestrecordset."),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "type", "PTR"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "ttl", "6000"),
 				),
 			},
 			resource.TestStep{
@@ -78,6 +86,12 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateCheck:  testAccVinylDNSRecordSetImportNSRecordStateCheck,
+			},
+			resource.TestStep{
+				ResourceName:      "vinyldns_record_set.test_ptr_record_set",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateCheck:  testAccVinylDNSRecordSetImportPTRRecordStateCheck,
 			},
 		},
 	})
@@ -218,6 +232,40 @@ func testAccVinylDNSRecordSetImportNSRecordStateCheck(s []*terraform.InstanceSta
 	ttl := rs.Attributes["ttl"]
 	if ttl != expTTL {
 		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
+	}
+
+	return nil
+}
+
+func testAccVinylDNSRecordSetImportPTRRecordStateCheck(s []*terraform.InstanceState) error {
+	if len(s) != 1 {
+		return fmt.Errorf("expected 1 state: %#v", s)
+	}
+
+	rs := s[0]
+
+	expName := "10"
+	name := rs.Attributes["name"]
+	if name != expName {
+		return fmt.Errorf("expected name attribute to be %s, received %s", expName, name)
+	}
+
+	expType := "PTR"
+	aType := rs.Attributes["type"]
+	if aType != expType {
+		return fmt.Errorf("expected type attribute to be %s, received %s", expType, aType)
+	}
+
+	expTTL := "6000"
+	ttl := rs.Attributes["ttl"]
+	if ttl != expTTL {
+		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
+	}
+
+	expPTRDName := "ptr.terraformtestrecordset."
+	ptrdName := rs.Attributes["record_ptrdnames.3198432272"]
+	if ptrdName != expPTRDName {
+		return fmt.Errorf("expected record_ptrdname attribute to be %s, received %s", expPTRDName, ptrdName)
 	}
 
 	return nil
@@ -372,6 +420,26 @@ resource "vinyldns_record_set" "test_ns_record_set" {
 	type = "NS"
 	ttl = 6000
 	record_nsdnames = ["ns1.parent.com."]
+	depends_on = [
+		"vinyldns_zone.test_zone"
+	]
+}
+
+resource "vinyldns_zone" "test_reverse_zone" {
+	name = "2.0.192.in-addr.arpa."
+	email = "foo@bar.com"
+	admin_group_id = "${vinyldns_group.test_group.id}"
+	depends_on = [
+		"vinyldns_group.test_group"
+	]
+}
+
+resource "vinyldns_record_set" "test_ptr_record_set" {
+	name = "10"
+	zone_id = "${vinyldns_zone.test_reverse_zone.id}"
+	type = "PTR"
+	ttl = 6000
+	record_ptrdnames = ["ptr.terraformtestrecordset."]
 	depends_on = [
 		"vinyldns_zone.test_zone"
 	]
