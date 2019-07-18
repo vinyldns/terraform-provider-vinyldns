@@ -83,7 +83,7 @@ release: package
 		--target "$(shell git rev-parse --abbrev-ref HEAD)" \
 		--tag "${VERSION}" \
 		--name "${VERSION}"
-	ls release/*.tgz | xargs -I FILE github-release upload \
+	cd release && ls *.tgz | xargs -I FILE github-release upload \
 		--user vinyldns \
 		--repo "${NAME}" \
 		--tag "${VERSION}" \
