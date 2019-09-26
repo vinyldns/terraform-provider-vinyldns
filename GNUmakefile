@@ -23,7 +23,7 @@ stop-api:
 # technique here: https://github.com/vinyldns/vinyldns/blob/master/bin/docker-up-vinyldns.sh
 # See `start-api` for a convenience task in doing so.
 test:
-	go vet "${SOURCE}"
+	GO111MODULE=on go vet "${SOURCE}"
 	GO111MODULE=on go test ${SOURCE} -cover
 	VINYLDNS_ACCESS_KEY=okAccessKey \
 		VINYLDNS_SECRET_KEY=okSecretKey \
