@@ -3,16 +3,9 @@ NAME=terraform-provider-vinyldns
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 VINYLDNS_REPO=github.com/vinyldns/vinyldns
 SOURCE=./...
-VERSION=0.9.4
+VERSION=0.9.5
 
-all: deps start-api test build stop-api
-deps-build: deps build
-
-deps:
-	go get -u github.com/golang/dep/cmd/dep
-	go get -u golang.org/x/tools/cmd/cover
-	go get -u github.com/mitchellh/gox
-	dep ensure
+all: start-api test build stop-api
 
 start-api:
 	if [ ! -d "$(GOPATH)/src/$(VINYLDNS_REPO)" ]; then \
@@ -30,8 +23,8 @@ stop-api:
 # technique here: https://github.com/vinyldns/vinyldns/blob/master/bin/docker-up-vinyldns.sh
 # See `start-api` for a convenience task in doing so.
 test:
-	go vet
-	go test ${SOURCE} -v -cover
+	go vet "${SOURCE}"
+	GO111MODULE=on go test ${SOURCE} -cover
 	VINYLDNS_ACCESS_KEY=okAccessKey \
 		VINYLDNS_SECRET_KEY=okSecretKey \
 		VINYLDNS_HOST=http://localhost:9000 \
@@ -39,16 +32,11 @@ test:
 		TF_ACC=1 \
 		go test ${SOURCE} -v
 
-cover:
-	go test $(TEST) -coverprofile=coverage.out
-	go tool cover -html=coverage.out
-	rm coverage.out
+install:
+	GO111MODULE=on go install
 
-install: deps
-	go install
-
-build: deps
-	export CGO_ENABLED=0; gox -ldflags "-X main.version=${VERSION}" -os "linux darwin windows" -arch "386 amd64" -output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns"
+build:
+	GO111MODULE=on CGO_ENABLED=0 gox -ldflags "-X main.version=${VERSION}" -os "linux darwin windows" -arch "386 amd64" -output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns"
 
 version:
 	echo ${VERSION}
@@ -90,4 +78,4 @@ release: package
 		--name FILE \
 		--file FILE
 
-.PHONY: deps run-api stop-api test cover install build version website website-test
+.PHONY: run-api stop-api test cover install build version website website-test

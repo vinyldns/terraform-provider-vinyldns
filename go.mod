@@ -1,0 +1,69 @@
+module github.com/vinyldns/terraform-provider-vinyldns
+
+require (
+	cloud.google.com/go v0.40.0
+	github.com/agext/levenshtein v1.2.2
+	github.com/apparentlymart/go-cidr v1.0.0
+	github.com/apparentlymart/go-textseg v1.0.0
+	github.com/armon/go-radix v1.0.0
+	github.com/aws/aws-sdk-go v1.20.3
+	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
+	github.com/bgentry/speakeasy v0.1.0
+	github.com/blang/semver v3.5.1+incompatible
+	github.com/davecgh/go-spew v1.1.1
+	github.com/fatih/color v1.7.0
+	github.com/golang/protobuf v1.3.1
+	github.com/google/go-cmp v0.3.0
+	github.com/googleapis/gax-go v2.0.0+incompatible
+	github.com/hashicorp/errwrap v1.0.0
+	github.com/hashicorp/go-cleanhttp v0.5.1
+	github.com/hashicorp/go-getter v1.3.0
+	github.com/hashicorp/go-hclog v0.9.2
+	github.com/hashicorp/go-multierror v1.0.0
+	github.com/hashicorp/go-plugin v1.0.1
+	github.com/hashicorp/go-safetemp v1.0.0
+	github.com/hashicorp/go-uuid v1.0.1
+	github.com/hashicorp/go-version v1.2.0
+	github.com/hashicorp/golang-lru v0.5.1
+	github.com/hashicorp/hcl v1.0.0
+	github.com/hashicorp/hcl2 v0.0.0-20190618163856-0b64543c968c
+	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93
+	github.com/hashicorp/logutils v1.0.0
+	github.com/hashicorp/terraform v0.12.2
+	github.com/hashicorp/terraform-config-inspect v0.0.0-20190524144125-e2ee25ba1e5e
+	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d
+	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
+	github.com/kr/pty v1.1.3 // indirect
+	github.com/mattn/go-colorable v0.1.1
+	github.com/mattn/go-isatty v0.0.8
+	github.com/mitchellh/cli v1.0.0
+	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
+	github.com/mitchellh/copystructure v1.0.0
+	github.com/mitchellh/go-homedir v1.1.0
+	github.com/mitchellh/go-testing-interface v1.0.0
+	github.com/mitchellh/go-wordwrap v1.0.0
+	github.com/mitchellh/hashstructure v1.0.0
+	github.com/mitchellh/mapstructure v1.1.2
+	github.com/mitchellh/reflectwalk v1.0.1
+	github.com/oklog/run v1.0.0
+	github.com/posener/complete v1.2.1
+	github.com/satori/go.uuid v1.2.0
+	github.com/smartystreets/go-aws-auth v0.0.0-20170504205021-8ef1316913ee
+	github.com/spf13/afero v1.2.2
+	github.com/ulikunitz/xz v0.5.6
+	github.com/vinyldns/go-vinyldns v0.0.0-20190611152741-b3d455312041
+	github.com/vmihailenco/msgpack v4.0.4+incompatible
+	github.com/zclconf/go-cty v1.0.0
+	github.com/zclconf/go-cty-yaml v0.1.0
+	go.opencensus.io v0.22.0
+	golang.org/x/crypto v0.0.0-20190618222545-ea8f1a30c443
+	golang.org/x/exp v0.0.0-20190221220918-438050ddec5e // indirect
+	golang.org/x/net v0.0.0-20190619014844-b5b0513f8c1b
+	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	golang.org/x/sys v0.0.0-20190618155005-516e3c20635f
+	golang.org/x/text v0.3.2
+	google.golang.org/api v0.6.0
+	google.golang.org/appengine v1.6.1
+	google.golang.org/genproto v0.0.0-20190611190212-a7e196e89fd3
+	google.golang.org/grpc v1.21.1
+)
