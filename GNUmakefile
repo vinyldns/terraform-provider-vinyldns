@@ -36,6 +36,7 @@ install:
 	GO111MODULE=on go install
 
 build:
+	go get github.com/mitchellh/gox
 	GO111MODULE=on CGO_ENABLED=0 gox -ldflags "-X main.version=${VERSION}" -os "linux darwin windows" -arch "386 amd64" -output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns"
 
 version:
