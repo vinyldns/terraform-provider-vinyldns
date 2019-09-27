@@ -280,6 +280,8 @@ github.com/tmc/grpc-websocket-proxy v0.0.0-20171017195756-830351dc03c6/go.mod h1
 github.com/ugorji/go v0.0.0-20180813092308-00b869d2f4a5/go.mod h1:hnLbHMwcvSihnDhEfx2/BzKp2xb0Y+ErdfYcrs9tkJQ=
 github.com/ulikunitz/xz v0.5.5 h1:pFrO0lVpTBXLpYw+pnLj6TbvHuyjXMfjGeCwSqCVwok=
 github.com/ulikunitz/xz v0.5.5/go.mod h1:2bypXElzHzzJZwzH67Y6wb67pO62Rzfn7BSiF4ABRW8=
+github.com/vinyldns/go-vinyldns v0.0.0-20190611152741-b3d455312041 h1:NXZT27/O5hSiO/92j8/l8fMKYrZHfywd2HEnPnuwv/E=
+github.com/vinyldns/go-vinyldns v0.0.0-20190611152741-b3d455312041/go.mod h1:AZuEfReFWdvtU0LatbLpo70t3lqdLvph2D5mqFP0bkA=
 github.com/vinyldns/go-vinyldns v0.0.0-20190823201453-1137fca6396f h1:wYWGiqNCv4JtMpYh3PUMBntMZjfNkt3KOLgR/BvHWIw=
 github.com/vinyldns/go-vinyldns v0.0.0-20190823201453-1137fca6396f/go.mod h1:AZuEfReFWdvtU0LatbLpo70t3lqdLvph2D5mqFP0bkA=
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
