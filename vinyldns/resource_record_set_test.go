@@ -344,7 +344,7 @@ func testRecordInZone(n string, s *terraform.State, expectedZone string) error {
 
 	// confirm that the record set exists in the correct zone
 	if z.Name != expectedZone {
-		fmt.Errorf("expected record set to exist in zone %s; it exists in %s", expectedZone, z.Name)
+		return fmt.Errorf("expected record set to exist in zone %s; it exists in %s", expectedZone, z.Name)
 	}
 
 	return nil
