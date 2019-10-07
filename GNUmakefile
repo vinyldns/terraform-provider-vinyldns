@@ -4,20 +4,24 @@ WEBSITE_REPO=github.com/hashicorp/terraform-website
 VINYLDNS_REPO=github.com/vinyldns/vinyldns
 SOURCE=./...
 VERSION=0.9.5
+VINYLDNS_VERSION=0.9.3
 
 all: start-api test build stop-api
 
 start-api:
-	if [ ! -d "$(GOPATH)/src/$(VINYLDNS_REPO)" ]; then \
-		echo "$(VINYLDNS_REPO) not found in your GOPATH (necessary for acceptance tests), getting..."; \
-		git clone https://$(VINYLDNS_REPO) $(GOPATH)/src/$(VINYLDNS_REPO); \
+	if [ ! -d "$(GOPATH)/src/$(VINYLDNS_REPO)-$(VINYLDNS_VERSION)" ]; then \
+		echo "$(VINYLDNS_REPO)-$(VINYLDNS_VERSION) not found in your GOPATH (necessary for acceptance tests), getting..."; \
+		git clone \
+			--branch v$(VINYLDNS_VERSION) \
+			https://$(VINYLDNS_REPO) \
+			$(GOPATH)/src/$(VINYLDNS_REPO)-$(VINYLDNS_VERSION); \
 	fi
-	$(GOPATH)/src/$(VINYLDNS_REPO)/bin/docker-up-vinyldns.sh \
-		--version 0.9.3 \
-		--api-only
+	$(GOPATH)/src/$(VINYLDNS_REPO)-$(VINYLDNS_VERSION)/bin/docker-up-vinyldns.sh \
+		--api-only \
+		--version $(VINYLDNS_VERSION)
 
 stop-api:
-	./../vinyldns/bin/remove-vinyl-containers.sh
+	$(GOPATH)/src/$(VINYLDNS_REPO)-$(VINYLDNS_VERSION)/bin/remove-vinyl-containers.sh
 
 # NOTE: acceptance tests assume a VinylDNS instance is running on localhost:9000 using the
 # technique here: https://github.com/vinyldns/vinyldns/blob/master/bin/docker-up-vinyldns.sh
