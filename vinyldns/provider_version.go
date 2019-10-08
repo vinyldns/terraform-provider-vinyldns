@@ -10,18 +10,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package vinyldns
 
-import (
-	"github.com/hashicorp/terraform/plugin"
-	"github.com/vinyldns/terraform-provider-vinyldns/vinyldns"
-)
+import "strings"
 
 var version string
 
-func main() {
-	vinyldns.SetVersion(version)
-	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: vinyldns.Provider,
-	})
+// SetVersion allows to set current provider version.
+func SetVersion(ver string) {
+	version = ver
+}
+
+// GetUserAgent returns UserAgent for provider based
+// on currently set version.
+func GetUserAgent() string {
+	if version == "" {
+		return "terraform-provider-vinyldns"
+	}
+
+	return strings.Join([]string{
+		"terraform-provider-vinyldns",
+		version,
+	}, "/")
 }
