@@ -77,6 +77,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		AccessKey: d.Get("access_key").(string),
 		SecretKey: d.Get("secret_key").(string),
 		Host:      d.Get("host").(string),
+		UserAgent: GetUserAgent(),
 	}
 
 	return vinyldns.NewClient(config), nil
