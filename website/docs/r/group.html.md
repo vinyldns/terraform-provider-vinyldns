@@ -33,3 +33,11 @@ The following arguments are supported:
 * `member_ids` - (Required) A list of member IDs to associate with the group.
 
 * `admin_ids` - (Required) A list of admin IDs to associate with the group.
+
+## Import
+
+`vinyldns_group` can be imported using the ID of the group, e.g.
+
+```
+terraform import vinyldns_group.example group_id
+```

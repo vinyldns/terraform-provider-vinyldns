@@ -53,3 +53,11 @@ The following arguments are supported:
 * `record_ptrdnames` - (Optional) If the record is a PTR record, a list of the record set's ptrdname values.
 
 * `record_cname` - (Optional) If the record is a CNAME, the record's value.
+
+## Import
+
+`vinyldns_record_set` can be imported using a combination of the ID of the zone and the ID of the record set, e.g.
+
+```
+terraform import vinyldns_record_set.example zone_id:record_set_id
+```

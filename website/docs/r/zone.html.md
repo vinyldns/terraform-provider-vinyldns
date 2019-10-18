@@ -80,3 +80,11 @@ The following attributes are exported:
 * `latest_sync` - The time when the zone was synced.
 
 * `shared` - A boolean flag indicating if the zone is a shared zone.
+
+## Import
+
+`vinyldns_zone` can be imported using the ID of the zone, e.g.
+
+```
+terraform import vinyldns_zone.example zone_id
+```
