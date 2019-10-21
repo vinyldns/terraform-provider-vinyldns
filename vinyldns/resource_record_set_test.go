@@ -278,10 +278,13 @@ func testAccVinylDNSRecordSetDestroy(s *terraform.State) error {
 		if rs.Type != "vinyldns_record_set" {
 			continue
 		}
-		zID, rsID := parseTwoPartID(rs.Primary.ID)
+		zID, rsID, err := parseTwoPartID(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
 
 		// Try to find the record set
-		_, err := client.RecordSet(zID, rsID)
+		_, err = client.RecordSet(zID, rsID)
 		if err == nil {
 			return fmt.Errorf("RecordSet %s still exists in zone %s", rsID, zID)
 		}
@@ -302,7 +305,10 @@ func testAccCheckVinylDNSRecordSetExists(n string) resource.TestCheckFunc {
 		}
 
 		client := testAccProvider.Meta().(*vinyldns.Client)
-		zID, rsID := parseTwoPartID(rs.Primary.ID)
+		zID, rsID, err := parseTwoPartID(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
 		readRs, err := client.RecordSet(zID, rsID)
 		if err != nil {
 			return err
@@ -327,7 +333,10 @@ func testRecordInZone(n string, s *terraform.State, expectedZone string) error {
 	}
 
 	client := testAccProvider.Meta().(*vinyldns.Client)
-	zID, rsID := parseTwoPartID(rs.Primary.ID)
+	zID, rsID, err := parseTwoPartID(rs.Primary.ID)
+	if err != nil {
+		return err
+	}
 	readRs, err := client.RecordSet(zID, rsID)
 	if err != nil {
 		return err

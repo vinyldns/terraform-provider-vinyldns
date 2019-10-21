@@ -13,6 +13,7 @@ limitations under the License.
 package vinyldns
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -29,10 +30,14 @@ func stringSetToStringSlice(stringSet *schema.Set) []string {
 	return ret
 }
 
-func parseTwoPartID(id string) (string, string) {
+func parseTwoPartID(id string) (string, string, error) {
 	parts := strings.Split(id, ":")
 
-	return parts[0], parts[1]
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("Unexpected ID format (%q). Expected zone_id:record_set_id", id)
+	}
+
+	return parts[0], parts[1], nil
 }
 
 // vinyldns responds 400 to IPv6 addresses represented within `[` `]`
