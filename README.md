@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/vinyldns/terraform-provider-vinyldns.svg?branch=master)](https://travis-ci.org/vinyldns/terraform-provider-vinyldns)
-![GitHub](https://img.shields.io/github/license/vinyldns/terraform-provider-vinyldns)
+[![GitHub](https://img.shields.io/github/license/vinyldns/terraform-provider-vinyldns)](https://github.com/vinyldns/vinyldns/blob/master/LICENSE)
+
 
 # terraform-provider-vinyldns
 
