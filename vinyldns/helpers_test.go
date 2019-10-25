@@ -17,12 +17,32 @@ import (
 )
 
 func Test_parseTwoPartID(t *testing.T) {
-	one, two := parseTwoPartID("123:456")
+	one, two, err := parseTwoPartID("123:456")
 	if one != "123" {
 		t.Fatalf("expected parseTwoPartID to return ID part 1 as '123'")
 	}
 	if two != "456" {
 		t.Fatalf("expected parseTwoPartID to return ID part 2 as '456'")
+	}
+
+	if err != nil {
+		t.Fatalf("Did not expect an error but one was raised. Error: %s", err)
+	}
+}
+
+func Test_parseTwoPartIDIncorrectSeparator(t *testing.T) {
+	one, two, err := parseTwoPartID("123.456")
+
+	if one != "" {
+		t.Fatalf("expected parseTwoPartID to return ID part 1 as ''")
+	}
+
+	if two != "" {
+		t.Fatalf("expected parseTwoPartID to return ID part 2 as ''")
+	}
+
+	if err == nil {
+		t.Fatalf("Expected an error but one was not raised")
 	}
 }
 
