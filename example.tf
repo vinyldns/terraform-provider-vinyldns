@@ -1,13 +1,11 @@
-resource "vinyldns_group" "test_group" {
-  name       = "terraform-provider-test-group"
-  member_ids = ["123"]
-  admin_ids  = ["123"]
+data "vinyldns_group" "test_group" {
+  id = "testgroupid"
 }
 
 resource "vinyldns_zone" "test_zone" {
   name           = "system-test."
   email          = "foo@bar.com"
-  admin_group_id = "${vinyldns_group.test_group.id}"
+  admin_group_id = "${data.vinyldns_group.test_group.id}"
 
   zone_connection {
     name           = "vinyldns."
