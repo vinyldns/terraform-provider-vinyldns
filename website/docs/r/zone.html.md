@@ -83,8 +83,8 @@ The following attributes are exported:
 
 ## Import
 
-`vinyldns_zone` can be imported using the ID of the zone, e.g.
+`vinyldns_zone` can be imported using the ID of the zone. For example:
 
 ```
-terraform import vinyldns_zone.example zone_id
+terraform import vinyldns_zone.example 9cbdd3ac-9752-4d56-9ca0-6a1a14fc5562
 ```
