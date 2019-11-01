@@ -1,9 +1,3 @@
-- Getting started
-
-  - [Installation](/#installation)
-  - [Testing](/#running-acceptance-tests)
-  - [Building](/#building)
-
 - Data Sources
 
   - [vinyldns_zone](data-sources/zone.md)
@@ -14,4 +8,4 @@
   - [vinyldns_zone](resources/zone.md)
   - [vinyldns_record_set](resources/record_set.md)
 
-- [Credits](/#credits)
+- [Repository](http://github.com/vinyldns/terraform-provider-vinyldns)
