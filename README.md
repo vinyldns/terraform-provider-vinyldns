@@ -9,7 +9,9 @@ A [Terraform](https://terraform.io) provider for the [VinylDNS](https://github.c
 * [Terraform](http://terraform.io)
 * [VinylDNS](https://www.vinyldns.io)
 
-See `example.tf` for an example `.tf` file. See `website/docs` for documentation.
+See [example.tf](https://github.com/vinyldns/terraform-provider-vinyldns/blob/master/example.tf) for an example `.tf` file.
+
+See https://vinyldns.github.io/terraform-provider-vinyldns for documentation.
 
 ## Installation
 
