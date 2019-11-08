@@ -32,5 +32,5 @@ The following arguments are supported:
 `vinyldns_group` can be imported using the ID of the group. For example:
 
 ```
-terraform import vinyldns_group.example group_id 6f8afcda-7529-4cad-9f2d-76903f4b1aca
+terraform import vinyldns_group.example 6f8afcda-7529-4cad-9f2d-76903f4b1aca
 ```
