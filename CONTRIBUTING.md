@@ -31,6 +31,10 @@ Provide more context by answering these questions:
 * Complete the [the required template](PULL_REQUEST_TEMPLATE.md)
 * Do not include issue numbers in the PR title
 
+## Documentation
+* Documentation lives in the `docs` directory and the site is deployed with GitHub pages
+* To run the documentation site locally: `cd docs; python -m SimpleHTTPServer 3000`
+
 ### Contributor License Agreement
 
 Before Comcast merges your code into the project you must sign the [Comcast Contributor License Agreement (CLA)](https://gist.github.com/ComcastOSS/a7b8933dd8e368535378cda25c92d19a).

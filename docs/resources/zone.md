@@ -1,10 +1,3 @@
----
-page_title: "VinylDNS: vinyldns_zone"
-sidebar_current: "docs-vinyldns-resource-zone"
-description: |-
-  The vinyldns_zone resource allows a VinylDNS zone to be created and managed.
----
-
 # vinyldns\_zone
 
 The zone resource allows VinylDNS zones to be created and managed.

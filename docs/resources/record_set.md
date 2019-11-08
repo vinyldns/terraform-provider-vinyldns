@@ -1,11 +1,3 @@
----
-layout: "vinyldns"
-page_title: "VinylDNS: vinyldns_record_set"
-sidebar_current: "docs-vinyldns-resource-record-set"
-description: |-
-  The vinyldns_record_set resource allows a VinylDNS record set to be created and managed.
----
-
 # vinyldns\_record_set
 
 The record set resource allows VinylDNS record sets to be created and managed.

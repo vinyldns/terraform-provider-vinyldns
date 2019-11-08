@@ -1,10 +1,3 @@
----
-page_title: "VinylDNS: vinyldns_group"
-sidebar_current: "docs-vinyldns-resource-group"
-description: |-
-  The vinyldns_group resource allows a VinylDNS group to be created and managed.
----
-
 # vinyldns\_group
 
 The group resource allows VinylDNS groups to be created and managed.
