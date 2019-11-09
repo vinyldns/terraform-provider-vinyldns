@@ -6,18 +6,18 @@ The record set resource allows VinylDNS record sets to be created and managed.
 
 ```hcl
 resource "vinyldns_record_set" "test_record_set" {
-  name = "terraformtestrecordset"
-  zone_id = "123"
-  type = "A"
-  ttl = 6000
+  name             = "terraformtestrecordset"
+  zone_id          = "123"
+  type             = "A"
+  ttl              = 6000
   record_addresses = ["127.0.0.1"]
 }
 
 resource "vinyldns_record_set" "another_test_record_set" {
-  name = "another-terraformtestrecordset"
-  zone_id = "123"
-  type = "CNAME"
-  ttl = 6000
+  name         = "another-terraformtestrecordset"
+  zone_id      = "123"
+  type         = "CNAME"
+  ttl          = 6000
   record_cname = "foo-bar.com."
 }
 ```

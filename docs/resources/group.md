@@ -7,9 +7,9 @@ The group resource allows VinylDNS groups to be created and managed.
 ```hcl
 # Create a VinylDNS group
 resource "vinyldns_group" "test_group" {
-  name = "terraform-provider-test-group"
+  name       = "terraform-provider-test-group"
   member_ids = ["123"]
-  admin_ids = ["123"]
+  admin_ids  = ["123"]
 }
 ```
 
@@ -29,7 +29,7 @@ The following arguments are supported:
 
 ## Import
 
-`vinyldns_group` can be imported using the ID of the group. For example:
+`vinyldns_group` can be imported using the ID of the group. For example, command can be used to import a group with ID `6f8afcda-7529-4cad-9f2d-76903f4b1aca`:
 
 ```
 terraform import vinyldns_group.example 6f8afcda-7529-4cad-9f2d-76903f4b1aca
