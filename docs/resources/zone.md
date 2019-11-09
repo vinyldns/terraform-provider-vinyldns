@@ -76,7 +76,7 @@ The following attributes are exported:
 
 ## Import
 
-`vinyldns_zone` can be imported using the ID of the zone. For example:
+`vinyldns_zone` can be imported using the ID of the zone. For example, run the following command to import a zone with ID `9cbdd3ac-9752-4d56-9ca0-6a1a14fc5562`:
 
 ```
 terraform import vinyldns_zone.example 9cbdd3ac-9752-4d56-9ca0-6a1a14fc5562

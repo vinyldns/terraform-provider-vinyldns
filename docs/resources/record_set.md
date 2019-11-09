@@ -1,6 +1,6 @@
 # vinyldns\_record_set
 
-The record set resource allows VinylDNS record sets to be created and managed.
+The record set resource allows VinylDNS recordsets to be created and managed.
 
 ## Example Usage
 
@@ -30,7 +30,7 @@ The following arguments are supported:
 
 * `zone_id` - (Required) The ID for the record set's zone.
 
-* `owner_group_id` - (Optional) Record ownership assignment. This is applicable if the recordset exists in a shared zone.
+* `owner_group_id` - (Optional) Record ownership assignment. This is applicable if the record set exists in a shared zone.
 
 * `type` - (Required) The type of DNS record.
 
@@ -48,7 +48,7 @@ The following arguments are supported:
 
 ## Import
 
-`vinyldns_record_set` can be imported using a combination of the ID of the zone and the ID of the record set. For example:
+`vinyldns_record_set` can be imported using a combination of its zone ID and record set ID. For example, run the following command to import a record set with ID `8306cce4-e16a-4579-9b19-4af46dc75853` from a zone with ID `9cbdd3ac-9752-4d56-9ca0-6a1a14fc5562`:
 
 ```
 terraform import vinyldns_record_set.example 9cbdd3ac-9752-4d56-9ca0-6a1a14fc5562:8306cce4-e16a-4579-9b19-4af46dc75853
