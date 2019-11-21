@@ -12,13 +12,13 @@ resource "vinyldns_group" "test_group" {
 
 # Create a VinylDNS zone with a zone connection
 resource "vinyldns_zone" "test_zone" {
-  name = "system-test."
-  email = "foo@bar.com"
+  name           = "system-test."
+  email          = "foo@bar.com"
   admin_group_id = "${vinyldns_group.test_group.id}"
   zone_connection {
-    name = "vinyldns."
-    key_name = "vinyldns."
-    key = "123"
+    name           = "vinyldns."
+    key_name       = "vinyldns."
+    key            = "123"
     primary_server = "127.0.0.1"
   }
 }
@@ -76,7 +76,7 @@ The following attributes are exported:
 
 ## Import
 
-`vinyldns_zone` can be imported using the ID of the zone. For example:
+`vinyldns_zone` can be imported using the ID of the zone. For example, run the following command to import a zone with ID `9cbdd3ac-9752-4d56-9ca0-6a1a14fc5562`:
 
 ```
 terraform import vinyldns_zone.example 9cbdd3ac-9752-4d56-9ca0-6a1a14fc5562
