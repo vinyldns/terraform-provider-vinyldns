@@ -61,8 +61,8 @@ endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
 package: build
-	rm -rf release
-	mkdir release
+	find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -print
+	find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -delete
 	for f in build/*; do \
 		g=`basename $$f`; \
 		tar -zcf release/$(NAME)-$${g}-$(VERSION).tgz -C build/$${g} .; \

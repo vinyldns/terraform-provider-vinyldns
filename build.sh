@@ -16,6 +16,8 @@ pushd $DIR
 # Cleanup old artifacts
 find build -not -name build -not -name '.dockerignore' -not -name '.gitignore' -print
 find build -not -name build -not -name '.dockerignore' -not -name '.gitignore' -delete
+find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -print
+find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -delete
 
 # Build artifacts
 docker-compose build --no-cache builder
