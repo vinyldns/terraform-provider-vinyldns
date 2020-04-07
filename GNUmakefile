@@ -72,6 +72,8 @@ package: build
 		g=`basename $$f`; \
 		zip --junk-paths release/$(NAME)-$(VERSION)-$${g}.zip build/$${g}/$(NAME)*; \
 	done
+	cd release && shasum -a 256 *.zip > $(NAME)-$(VERSION)-SHASUMS
+	cd release && gpg --detach-sign $(NAME)-$(VERSION)-SHASUMS
 
 release: package
 	go get github.com/aktau/github-release
@@ -81,7 +83,7 @@ release: package
 		--target "$(shell git rev-parse --abbrev-ref HEAD)" \
 		--tag "${VERSION}" \
 		--name "${VERSION}"
-	cd release && ls *.zip | xargs -I FILE github-release upload \
+	cd release && ls | xargs -I FILE github-release upload \
 		--user vinyldns \
 		--repo "${NAME}" \
 		--tag "${VERSION}" \
