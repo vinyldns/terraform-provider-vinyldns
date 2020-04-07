@@ -73,7 +73,9 @@ package: build
 		zip --junk-paths release/$(NAME)-$(VERSION)-$${g}.zip build/$${g}/$(NAME)*; \
 	done
 	cd release && shasum -a 256 *.zip > $(NAME)-$(VERSION)-SHASUMS
-	cd release && gpg --detach-sign $(NAME)-$(VERSION)-SHASUMS
+	cd release && gpg \
+		--recipient "vinyldns@gmail.com" \
+		--detach-sign $(NAME)-$(VERSION)-SHASUMS
 
 release: package
 	go get github.com/aktau/github-release
