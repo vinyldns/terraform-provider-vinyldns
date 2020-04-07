@@ -41,7 +41,12 @@ install:
 
 build:
 	go get github.com/mitchellh/gox
-	GO111MODULE=on CGO_ENABLED=0 gox -ldflags "-X main.version=${VERSION}" -os "linux darwin windows" -arch "386 amd64" -output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns"
+	GO111MODULE=on CGO_ENABLED=0 \
+		gox \
+			-ldflags "-X main.version=${VERSION}" \
+			-os "linux darwin windows" \
+			-arch "386 amd64" \
+			-output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns-$(VERSION)"
 
 version:
 	echo ${VERSION}
@@ -65,7 +70,7 @@ package: build
 	mkdir release
 	for f in build/*; do \
 		g=`basename $$f`; \
-		tar -zcf release/$(NAME)-$${g}-$(VERSION).tgz -C build/$${g} .; \
+		zip --junk-paths release/$(NAME)-$(VERSION)-$${g}.zip build/$${g}/$(NAME)*; \
 	done
 
 release: package
@@ -76,7 +81,7 @@ release: package
 		--target "$(shell git rev-parse --abbrev-ref HEAD)" \
 		--tag "${VERSION}" \
 		--name "${VERSION}"
-	cd release && ls *.tgz | xargs -I FILE github-release upload \
+	cd release && ls *.zip | xargs -I FILE github-release upload \
 		--user vinyldns \
 		--repo "${NAME}" \
 		--tag "${VERSION}" \
