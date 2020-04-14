@@ -68,8 +68,8 @@ endif
 # as that key has been uploaded to registry.terraform.io
 # TODO: this should ideally use a dedicated key
 package: build
-	rm -rf release
-	mkdir release
+	find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -print
+	find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -delete
 	for f in build/*; do \
 		g=`basename $$f`; \
 		zip --junk-paths release/$(NAME)_$(VERSION)_$${g}.zip build/$${g}/$(NAME)*; \
