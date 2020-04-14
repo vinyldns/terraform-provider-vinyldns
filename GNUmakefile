@@ -44,8 +44,7 @@ build:
 	GO111MODULE=on CGO_ENABLED=0 \
 		gox \
 			-ldflags "-X main.version=${VERSION}" \
-			-os "linux darwin windows" \
-			-arch "386 amd64" \
+			-osarch "darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm linux/arm64 openbsd/386 openbsd/amd64 solaris/amd64 windows/386 windows/amd64" \
 			-output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns-$(VERSION)"
 
 version:
