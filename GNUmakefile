@@ -45,7 +45,7 @@ build:
 		gox \
 			-ldflags "-X main.version=${VERSION}" \
 			-osarch "darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm linux/arm64 openbsd/386 openbsd/amd64 solaris/amd64 windows/386 windows/amd64" \
-			-output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns-$(VERSION)"
+			-output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns_$(VERSION)"
 
 version:
 	echo ${VERSION}
@@ -72,13 +72,11 @@ package: build
 	mkdir release
 	for f in build/*; do \
 		g=`basename $$f`; \
-		zip --junk-paths release/$(NAME)-$(VERSION)-$${g}.zip build/$${g}/$(NAME)*; \
-		tar -zcf release/$(NAME)-$${g}-$(VERSION).tgz -C build/$${g} .; \
+		zip --junk-paths release/$(NAME)_$(VERSION)_$${g}.zip build/$${g}/$(NAME)*; \
 	done
-	cd release && shasum -a 256 *.zip > $(NAME)-$(VERSION)-SHASUMS
+	cd release && shasum -a 256 *.zip > $(NAME)_$(VERSION)_SHA256SUMS
 	cd release && gpg \
-		--armor \
-		--detach-sign $(NAME)-$(VERSION)-SHASUMS
+		--detach-sign $(NAME)_$(VERSION)_SHA256SUMS
 
 release: package
 	go get github.com/aktau/github-release
