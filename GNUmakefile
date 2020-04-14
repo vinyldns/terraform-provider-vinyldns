@@ -64,9 +64,8 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-# NOTE: this currently uses a mikedball@gmail.com GPG key,
-# as that key has been uploaded to registry.terraform.io
-# TODO: this should ideally use a dedicated key
+# TODO: this should ideally use a dedicated key,
+# perhaps one associated with vinyldns@gmail.com
 package: build
 	find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -print
 	find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -delete
