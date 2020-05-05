@@ -89,27 +89,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 }
 
 func resourceVinylDNSRecordSetCreate(d *schema.ResourceData, meta interface{}) error {
-	name := d.Get("name").(string)
-	log.Printf("[INFO] Creating vinyldns record set: %s", name)
-	records, err := records(d)
-	if err != nil {
-		return err
-	}
-	created, err := meta.(*vinyldns.Client).RecordSetCreate(&vinyldns.RecordSet{
-		Name:         d.Get("name").(string),
-		ZoneID:       d.Get("zone_id").(string),
-		OwnerGroupID: d.Get("owner_group_id").(string),
-		Type:         d.Get("type").(string),
-		TTL:          d.Get("ttl").(int),
-		Records:      records,
-	})
-	if err != nil {
-		return err
-	}
-
-	d.SetId(created.RecordSet.ZoneID + ":" + created.RecordSet.ID)
-
-	err = waitUntilRecordSetDeployed(d, meta, created.ChangeID)
+	err := createRecordSet(d, meta)
 	if err != nil {
 		return err
 	}
@@ -215,14 +195,63 @@ func resourceVinylDNSRecordSetUpdate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
-	log.Printf("[INFO] Updating vinyldns record set %s in zone %s", rsID, zID)
+
+	if d.HasChange("name") || d.HasChange("type") {
+		log.Printf("[INFO] Detected a change in name/type, deleting/creating as update does not support record name or type changes")
+		err := deleteRecordSet(d, meta)
+		if err != nil {
+			return err
+		}
+		err = createRecordSet(d, meta)
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Printf("[INFO] Updating vinyldns record set %s in zone %s", rsID, zID)
+		records, err := records(d)
+		if err != nil {
+			return err
+		}
+		updated, err := meta.(*vinyldns.Client).RecordSetUpdate(&vinyldns.RecordSet{
+			Name:         d.Get("name").(string),
+			ID:           rsID,
+			ZoneID:       d.Get("zone_id").(string),
+			OwnerGroupID: d.Get("owner_group_id").(string),
+			Type:         d.Get("type").(string),
+			TTL:          d.Get("ttl").(int),
+			Records:      records,
+		})
+		if err != nil {
+			return err
+		}
+
+		err = waitUntilRecordSetDeployed(d, meta, updated.ChangeID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return resourceVinylDNSRecordSetRead(d, meta)
+}
+
+func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) error {
+	err := deleteRecordSet(d, meta)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createRecordSet(d *schema.ResourceData, meta interface{}) error {
+	name := d.Get("name").(string)
+	log.Printf("[INFO] Creating vinyldns record set: %s", name)
 	records, err := records(d)
 	if err != nil {
 		return err
 	}
-	updated, err := meta.(*vinyldns.Client).RecordSetUpdate(&vinyldns.RecordSet{
+	created, err := meta.(*vinyldns.Client).RecordSetCreate(&vinyldns.RecordSet{
 		Name:         d.Get("name").(string),
-		ID:           rsID,
 		ZoneID:       d.Get("zone_id").(string),
 		OwnerGroupID: d.Get("owner_group_id").(string),
 		Type:         d.Get("type").(string),
@@ -233,15 +262,17 @@ func resourceVinylDNSRecordSetUpdate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	err = waitUntilRecordSetDeployed(d, meta, updated.ChangeID)
+	d.SetId(created.RecordSet.ZoneID + ":" + created.RecordSet.ID)
+
+	err = waitUntilRecordSetDeployed(d, meta, created.ChangeID)
 	if err != nil {
 		return err
 	}
 
-	return resourceVinylDNSRecordSetRead(d, meta)
+	return nil
 }
 
-func resourceVinylDNSRecordSetDelete(d *schema.ResourceData, meta interface{}) error {
+func deleteRecordSet(d *schema.ResourceData, meta interface{}) error {
 	zID, rsID, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return err
