@@ -41,7 +41,11 @@ install:
 
 build:
 	go get github.com/mitchellh/gox
-	GO111MODULE=on CGO_ENABLED=0 gox -ldflags "-X main.version=${VERSION}" -os "linux darwin windows" -arch "386 amd64" -output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns"
+	GO111MODULE=on CGO_ENABLED=0 \
+		gox \
+			-ldflags "-X main.version=${VERSION}" \
+			-osarch "darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm linux/arm64 openbsd/386 openbsd/amd64 solaris/amd64 windows/386 windows/amd64" \
+			-output "build/{{.OS}}_{{.Arch}}/terraform-provider-vinyldns_$(VERSION)"
 
 version:
 	echo ${VERSION}
@@ -60,13 +64,18 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
+# TODO: this should ideally use a dedicated key,
+# perhaps one associated with vinyldns@gmail.com
 package: build
 	find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -print
 	find release -not -name release -not -name '.dockerignore' -not -name '.gitignore' -delete
 	for f in build/*; do \
 		g=`basename $$f`; \
-		tar -zcf release/$(NAME)-$${g}-$(VERSION).tgz -C build/$${g} .; \
+		zip --junk-paths release/$(NAME)_$(VERSION)_$${g}.zip build/$${g}/$(NAME)*; \
 	done
+	cd release && shasum -a 256 *.zip > $(NAME)_$(VERSION)_SHA256SUMS
+	cd release && gpg \
+		--detach-sign $(NAME)_$(VERSION)_SHA256SUMS
 
 release: package
 	go get github.com/aktau/github-release
@@ -76,7 +85,7 @@ release: package
 		--target "$(shell git rev-parse --abbrev-ref HEAD)" \
 		--tag "${VERSION}" \
 		--name "${VERSION}"
-	cd release && ls *.tgz | xargs -I FILE github-release upload \
+	cd release && ls | xargs -I FILE github-release upload \
 		--user vinyldns \
 		--repo "${NAME}" \
 		--tag "${VERSION}" \
