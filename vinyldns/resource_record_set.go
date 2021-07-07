@@ -53,7 +53,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set: func(v interface{}) int {
-					return hashcode.String(v.(string))
+					return hashcode.String(removeBrackets(v.(string)))
 				},
 			},
 			"record_texts": &schema.Schema{
@@ -200,7 +200,7 @@ func resourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) err
 
 	recs := make([]interface{}, 0, len(rs.Records))
 	for _, r := range rs.Records {
-		recs = append(recs, r.Address)
+		recs = append(recs, removeBrackets(r.Address))
 	}
 
 	if err := d.Set("record_addresses", schema.NewSet(schema.HashString, recs)); err != nil {
