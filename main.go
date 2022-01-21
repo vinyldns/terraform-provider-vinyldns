@@ -13,7 +13,7 @@ limitations under the License.
 package main
 
 import (
-	"github.com/hashicorp/terraform/plugin"
+	"github.com/hashicorp/terraform-plugin-sdk/plugin"
 	"github.com/vinyldns/terraform-provider-vinyldns/vinyldns"
 )
 

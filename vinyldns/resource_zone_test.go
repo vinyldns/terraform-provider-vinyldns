@@ -17,8 +17,8 @@ import (
 	"log"
 	"testing"
 
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -29,7 +29,7 @@ const (
 	zConName          = "vinyldns."
 	zConKey           = "nzisn+4G2ldMn0q1CV3vsg=="
 	zConKeyName       = "vinyldns."
-	zConPrimaryServer = "vinyldns-bind9"
+	zConPrimaryServer = "localhost:19001"
 	// NOTE: If ever the test config HCL is changed, these zACLRule*Hash var
 	// values will change as well, as TypeSets are stored in state with an
 	// index value calculated by the hash of the attributes of the set.

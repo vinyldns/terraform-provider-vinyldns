@@ -15,7 +15,7 @@ package vinyldns
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 func TestVinylDNSRecordSetMigrateStateID(t *testing.T) {
