@@ -50,7 +50,7 @@ execute-tests:
 
 .PHONY: install
 install:
-	set -euo pipefail
+	@set -euo pipefail
 	go install
 	mkdir -p "$${HOME}/.terraform.d/plugins/local/vinyldns-provider/vinyldns/0.0.1/$$(go env GOOS)_$$(go env GOARCH)/"
 	cp "$$(go env GOPATH)/bin/terraform-provider-vinyldns" "$${HOME}/.terraform.d/plugins/local/vinyldns-provider/vinyldns/0.0.1/$$(go env GOOS)_$$(go env GOARCH)/"
