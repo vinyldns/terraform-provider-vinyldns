@@ -1,21 +1,23 @@
-[![Build Status](https://travis-ci.org/vinyldns/terraform-provider-vinyldns.svg?branch=master)](https://travis-ci.org/vinyldns/terraform-provider-vinyldns)
+[![Build Status](https://github.com/vinyldns/terraform-provider-vinyldns/actions/workflows/release.yml/badge.svg)](https://github.com/vinyldns/terraform-provider-vinyldns/actions/workflows/release.yml)
 [![GitHub](https://img.shields.io/github/license/vinyldns/terraform-provider-vinyldns)](https://github.com/vinyldns/vinyldns/blob/master/LICENSE)
-
 
 # terraform-provider-vinyldns
 
-A [Terraform](https://terraform.io) provider for the [VinylDNS](https://github.com/vinyldns/vinyldns) DNS as a service API.
+A [Terraform](https://terraform.io) provider for the [VinylDNS](https://github.com/vinyldns/vinyldns) DNS as a service
+API.
 
 * [Terraform](http://terraform.io)
 * [VinylDNS](https://www.vinyldns.io)
 
-See [example.tf](https://github.com/vinyldns/terraform-provider-vinyldns/blob/master/example.tf) for an example `.tf` file.
+See [example.tf](https://github.com/vinyldns/terraform-provider-vinyldns/blob/master/example.tf) for an example `.tf`
+file.
 
 See https://vinyldns.github.io/terraform-provider-vinyldns for documentation.
 
 ## Installation
 
-1. Download the desired release version for your operating system from [GitHub](https://github.com/vinyldns/terraform-provider-vinyldns/releases).
+1. Download the desired release version for your operating system
+   from [GitHub](https://github.com/vinyldns/terraform-provider-vinyldns/releases).
 2. Untar the download contents
 3. Install the `terraform-provider-vinyldns` anywhere on your system
 4. Add `terraform-provider-vinyldns` to your `~/.terraformrc` file:
@@ -84,13 +86,16 @@ make build
 
 ### Building in Docker
 
-The project contains a `docker-compose.yml`/`Dockerfile` that will perform a test build in a empty container. To run on windows:
+The project contains a `docker-compose.yml`/`Dockerfile` that will perform a test build in a empty container. To run on
+windows:
 
 ```bash
 docker-compose up --force-recreate --build builder
 docker-compose down
 ```
+
 or on Mac or Linux (preferred):
+
 ```bash
 ./build.sh
 ```
@@ -107,9 +112,11 @@ dep ensure -add github.com/pkg/errors
 
 ## Credits
 
-`terraform-provider-vinyldns` would not be possible without the help of many other pieces of open source software. Thank you open source world!
+`terraform-provider-vinyldns` would not be possible without the help of many other pieces of open source software. Thank
+you open source world!
 
-Given the Apache 2.0 license of `terraform-provider-vinyldns`, we specifically want to call out the following packages and their corresponding licenses:
+Given the Apache 2.0 license of `terraform-provider-vinyldns`, we specifically want to call out the following packages
+and their corresponding licenses:
 
 * [github.com/hashicorp/errwrap](https://github.com/hashicorp/errwrap) - Mozilla Public License 2.0
 * [github.com/hashicorp/go-getter](https://github.com/hashicorp/go-getter) - Mozilla Public License 2.0
