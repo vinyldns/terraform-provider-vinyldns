@@ -50,7 +50,27 @@ execute-tests:
 
 .PHONY: install
 install:
+	set -euo pipefail
 	go install
+	mkdir -p "$${HOME}/.terraform.d/plugins/local/vinyldns-provider/vinyldns/0.0.1/$$(go env GOOS)_$$(go env GOARCH)/"
+	cp "$$(go env GOPATH)/bin/terraform-provider-vinyldns" "$${HOME}/.terraform.d/plugins/local/vinyldns-provider/vinyldns/0.0.1/$$(go env GOOS)_$$(go env GOARCH)/"
+
+.PHONY: clean
+clean:
+	@set -euo pipefail
+	if [ -d "$(ROOT_DIR)/build/" ]; then
+		echo -n "Cleaning existing build.." && \
+		rm -rf "$(ROOT_DIR)/build" && echo "done."
+	fi
+
+.PHONY: build
+build: clean
+	@set -euo pipefail
+	echo -n "Building provider.." && \
+	mkdir -p "$(ROOT_DIR)/build/$$(go env GOOS)_$$(go env GOARCH)/" && \
+	go build  -o "$(ROOT_DIR)/build/$$(go env GOOS)_$$(go env GOARCH)/" "$(GO_TARGET)" && \
+	echo "done." && \
+	echo "Compiled binary: $(ROOT_DIR)/build/$$(go env GOOS)_$$(go env GOARCH)/$(NAME)"
 
 .PHONY: version
 version:
