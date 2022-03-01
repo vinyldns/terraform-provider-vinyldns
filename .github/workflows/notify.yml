@@ -1,0 +1,55 @@
+name: Notify on Workflow Complete
+
+on:
+  workflow_run:
+    workflows: [verify, release]
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack Notification On Success
+        uses: slackapi/slack-github-action@v1.18.0
+        if: github.event.workflow_run.conclusion == 'success'
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "[Terraform-Provider-vinyldns] ${{ github.event.workflow.name }} workflow completed successfully!\nAction: ${{ github.event.workflow_run.html_url }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":check_mark: [Terraform-Provider-vinyldns] `${{ github.event.workflow.name }}` workflow completed successfully!\nAction: ${{ github.event.workflow_run.html_url }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Send Slack Notification on Failure
+        uses: slackapi/slack-github-action@v1.18.0
+        if: github.event.workflow_run.conclusion != 'success'
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "[Terraform-Provider-vinyldns] ${{ github.event.workflow.name }} FAILED!\nAction: ${{ github.event.workflow_run.html_url }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":x: [Terraform-Provider-vinyldns] `${{ github.event.workflow.name }}` FAILED!\nAction: ${{ github.event.workflow_run.html_url }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
