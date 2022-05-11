@@ -44,6 +44,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 			"type": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"ttl": {
 				Type:     schema.TypeInt,
