@@ -3,8 +3,9 @@ module github.com/vinyldns/terraform-provider-vinyldns
 go 1.17
 
 require (
+	github.com/hashicorp/go-getter v1.5.11 // indirect; - FIX FOR CVE-2022-29810
 	github.com/hashicorp/terraform-plugin-sdk v1.7.0
-	github.com/ulikunitz/xz v0.5.8 // indirect - FIX FOR CVE-2021-29482
+	github.com/ulikunitz/xz v0.5.8 // indirect; - FIX FOR CVE-2021-29482
 	github.com/vinyldns/go-vinyldns v0.9.16
 )
 
@@ -24,8 +25,7 @@ require (
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
-	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
-	github.com/hashicorp/go-getter v1.4.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v0.9.2 // indirect
 	github.com/hashicorp/go-multierror v1.0.0 // indirect
 	github.com/hashicorp/go-plugin v1.0.1 // indirect
@@ -42,6 +42,7 @@ require (
 	github.com/hashicorp/terraform-svchost v0.0.0-20191011084731-65d371908596 // indirect
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
+	github.com/klauspost/compress v1.11.2 // indirect
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.5 // indirect
 	github.com/mitchellh/cli v1.0.0 // indirect
