@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/terraform/helper/hashcode"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -27,28 +27,30 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 		MigrateState: resourceVinylDNSRecordSetMigrateState,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"zone_id": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"owner_group_id": &schema.Schema{
+			"zone_id": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"owner_group_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"type": &schema.Schema{
+			"type": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
-			"ttl": &schema.Schema{
+			"ttl": {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"record_addresses": &schema.Schema{
+			"record_addresses": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -56,7 +58,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(removeBrackets(v.(string)))
 				},
 			},
-			"record_texts": &schema.Schema{
+			"record_texts": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -64,7 +66,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
-			"record_nsdnames": &schema.Schema{
+			"record_nsdnames": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -72,7 +74,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
-			"record_ptrdnames": &schema.Schema{
+			"record_ptrdnames": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
@@ -80,7 +82,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 					return hashcode.String(v.(string))
 				},
 			},
-			"record_cname": &schema.Schema{
+			"record_cname": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -291,7 +293,7 @@ func records(d *schema.ResourceData) ([]vinyldns.Record, error) {
 		}
 
 		return []vinyldns.Record{
-			vinyldns.Record{
+			{
 				CName: cname,
 			},
 		}, nil

@@ -16,11 +16,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func stringSetToStringSlice(stringSet *schema.Set) []string {
-	ret := []string{}
+	var ret []string
 	if stringSet == nil {
 		return ret
 	}

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -60,7 +60,7 @@ func testAccVinylDNSZoneDataSourcePreCheck(t *testing.T) error {
 			Name:          "vinyldns.",
 			Key:           "nzisn+4G2ldMn0q1CV3vsg==",
 			KeyName:       "vinyldns.",
-			PrimaryServer: "vinyldns-bind9",
+			PrimaryServer: "localhost:19001",
 		},
 	})
 	if err != nil {

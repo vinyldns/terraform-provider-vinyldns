@@ -1,5 +1,0 @@
-builder:
-  build: .
-  volumes:
-    - ./build:/go/src/github.com/vinyldns/terraform-provider-vinyldns/build
-    - ./release:/go/src/github.com/vinyldns/terraform-provider-vinyldns/release

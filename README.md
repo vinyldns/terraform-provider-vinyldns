@@ -1,28 +1,32 @@
-[![Build Status](https://travis-ci.org/vinyldns/terraform-provider-vinyldns.svg?branch=master)](https://travis-ci.org/vinyldns/terraform-provider-vinyldns)
+[![Terraform Registry](https://img.shields.io/github/v/release/vinyldns/terraform-provider-vinyldns?color=834FB9&label=registry&logo=terraform)](https://registry.terraform.io/providers/vinyldns/vinyldns/latest)
+[![Build Status](https://github.com/vinyldns/terraform-provider-vinyldns/actions/workflows/release.yml/badge.svg)](https://github.com/vinyldns/terraform-provider-vinyldns/actions/workflows/release.yml)
 [![GitHub](https://img.shields.io/github/license/vinyldns/terraform-provider-vinyldns)](https://github.com/vinyldns/vinyldns/blob/master/LICENSE)
-
 
 # terraform-provider-vinyldns
 
-A [Terraform](https://terraform.io) provider for the [VinylDNS](https://github.com/vinyldns/vinyldns) DNS as a service API.
+A [Terraform](https://terraform.io) provider for the [VinylDNS](https://github.com/vinyldns/vinyldns) DNS as a service
+API.
 
 * [Terraform](http://terraform.io)
 * [VinylDNS](https://www.vinyldns.io)
 
-See [example.tf](https://github.com/vinyldns/terraform-provider-vinyldns/blob/master/example.tf) for an example `.tf` file.
+See [example.tf](https://github.com/vinyldns/terraform-provider-vinyldns/blob/master/example.tf) for an example `.tf`
+file.
 
 See https://vinyldns.github.io/terraform-provider-vinyldns for documentation.
 
 ## Installation
 
-1. Download the desired release version for your operating system from [GitHub](https://github.com/vinyldns/terraform-provider-vinyldns/releases).
-2. Untar the download contents
-3. Install the `terraform-provider-vinyldns` anywhere on your system
-4. Add `terraform-provider-vinyldns` to your `~/.terraformrc` file:
+1. Create a `providers.tf` file and add the `vinyldns` provider
 
-```
-providers {
-  "vinyldns" = "path/to/your/terraform-provider-vinyldns"
+```hcl
+terraform {
+  required_providers {
+    vinyldns = {
+      source  = "vinyldns/vinyldns"
+      version = "0.10.0"
+    }
+  }
 }
 ```
 
@@ -30,17 +34,24 @@ providers {
 
 Alternatively, you can install from source:
 
-```
-go get github.com/vinyldns/terraform-provider-vinyldns
-cd $GOPATH/src/github.com/vinyldns/terraform-provider-vinyldns
-make install
+```shell script
+$ git clone https://github.com/vinyldns/terraform-provider-vinyldns.git
+$ cd terraform-provider-vinyldns
+$ make install
 ```
 
-Add `terraform-provider-vinyldns` to your `~/.terraformrc`:
+Add the VinylDNS provider to `providers.tf` using the local path. Note that the locally installed version will always
+be `0.0.1` so as not to confuse it with the version released to
+the [Terraform Registry](https://registry.terraform.io/providers/vinyldns/vinyldns/latest).
 
-```
-providers {
-  "vinyldns" = "your-gopath/bin/terraform-provider-vinyldns"
+```hcl
+terraform {
+  required_providers {
+    vinyldns = {
+      source  = "local/vinyldns-provider/vinyldns"
+      version = "0.0.1"
+    }
+  }
 }
 ```
 
@@ -48,68 +59,29 @@ providers {
 
 The `terraform-provider-vinyldns` acceptance tests assume a VinylDNS API is running on `localhost:9000`.
 
-To run a local VinylDNS API, you'll need to:
+This will be done automatically for you via `make test`. Note that you must have `Docker` installed and running.
 
-```
-git clone git@github.com:vinyldns/vinyldns.git
-cd vinyldns
-bin/docker-up-vinyldns.sh
-```
-
-Note that a `make` convenience task handles this:
-
-```
-make start-api
-```
-
-Then, to run the `terraform-provider-vinyldns` acceptance tests against the local Dockerized VinylDNS API server:
-
-```
-make test
-```
-
-To stop the `localhost:9000` VinylDNS:
-
-```
-make stop-api
+```shell script
+$ git clone https://github.com/vinyldns/terraform-provider-vinyldns.git
+$ cd vinyldns
+$ make test
 ```
 
 ## Building
 
-To build `terraform-provider-vinyldns` binaries for all supported platforms:
+To build `terraform-provider-vinyldns` binaries for your current platform:
 
-```
-make build
-```
-
-### Building in Docker
-
-The project contains a `docker-compose.yml`/`Dockerfile` that will perform a test build in a empty container. To run on windows:
-
-```bash
-docker-compose up --force-recreate --build builder
-docker-compose down
-```
-or on Mac or Linux (preferred):
-```bash
-./build.sh
-```
-
-## Upgrading Dependencies
-
-`dep` is used to manage dependencies. To require a specific version of `github.com/vinyldns/go-vinyldns`:
-
-To add a dependency:
-
-```
-dep ensure -add github.com/pkg/errors
+```shell script
+$ make build
 ```
 
 ## Credits
 
-`terraform-provider-vinyldns` would not be possible without the help of many other pieces of open source software. Thank you open source world!
+`terraform-provider-vinyldns` would not be possible without the help of many other pieces of open source software. Thank
+you open source world!
 
-Given the Apache 2.0 license of `terraform-provider-vinyldns`, we specifically want to call out the following packages and their corresponding licenses:
+Given the Apache 2.0 license of `terraform-provider-vinyldns`, we specifically want to call out the following packages
+and their corresponding licenses:
 
 * [github.com/hashicorp/errwrap](https://github.com/hashicorp/errwrap) - Mozilla Public License 2.0
 * [github.com/hashicorp/go-getter](https://github.com/hashicorp/go-getter) - Mozilla Public License 2.0
