@@ -1,10 +1,10 @@
 module github.com/vinyldns/terraform-provider-vinyldns
 
-go 1.17
+go 1.19
 
 require (
 	github.com/hashicorp/terraform-plugin-sdk v1.7.0
-	github.com/ulikunitz/xz v0.5.8 // indirect - FIX FOR CVE-2021-29482
+	github.com/ulikunitz/xz v0.5.8 // indirect; indirect - FIX FOR CVE-2021-29482
 	github.com/vinyldns/go-vinyldns v0.9.16
 )
 
