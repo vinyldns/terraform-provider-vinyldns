@@ -1,6 +1,6 @@
 module github.com/vinyldns/terraform-provider-vinyldns
 
-go 1.17
+go 1.19
 
 require (
 	github.com/hashicorp/terraform-plugin-sdk v1.7.0
