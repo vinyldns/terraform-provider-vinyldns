@@ -15,7 +15,6 @@ jobs:
 
       - name: Run tests
         run: make test
-        shell: bash
 
       - name: Unshallow
         run: git fetch --prune --unshallow

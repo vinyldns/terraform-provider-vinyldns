@@ -20,6 +20,5 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Run tests
-        run: make test
-        shell: bash
+      - name: Build and test
+        run: make
