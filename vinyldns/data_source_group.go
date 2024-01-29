@@ -18,7 +18,7 @@ func dataSourceVinylDNSGroup() *schema.Resource {
 			},
 			"name": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Computed: true,
 			},
 			"email": {
 				Type:     schema.TypeString,
