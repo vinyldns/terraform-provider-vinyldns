@@ -76,7 +76,6 @@ func dataSourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("name", z.Name)
 	d.Set("type", z.Type)
 	d.Set("ttl", z.TTL)
-	d.Set("type", z.Type)
 	d.Set("zoneName", z.ZoneName)
 	d.Set("records", z.Records)
 	d.Set("isShared", z.IsShared)

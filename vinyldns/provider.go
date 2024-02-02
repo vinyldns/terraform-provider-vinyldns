@@ -48,8 +48,9 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"vinyldns_zone":  dataSourceVinylDNSZone(),
-			"vinyldns_group": dataSourceVinylDNSGroup(),
+			"vinyldns_zone":       dataSourceVinylDNSZone(),
+			"vinyldns_group":      dataSourceVinylDNSGroup(),
+			"vinyldns_record_set": dataSourceVinylDNSRecordSet(),
 		},
 
 		ConfigureFunc: providerConfigure,
