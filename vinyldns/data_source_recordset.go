@@ -12,39 +12,11 @@ func dataSourceVinylDNSRecordSet() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceVinylDNSRecordSetRead,
 		Schema: map[string]*schema.Schema{
-			"recordId": {
+			"zoneid": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"zoneId": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"type": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"ttl": {
-				Type:     schema.TypeInt,
-				Computed: true,
-			},
-			"zoneName": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"records": {
-				Type:     schema.TypeMap,
-				Computed: true,
-			},
-			"isShared": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-			"ownerGroupId": {
+			"recordset": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -53,33 +25,37 @@ func dataSourceVinylDNSRecordSet() *schema.Resource {
 }
 
 func dataSourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) error {
-	var zoneId string
-	var recordId string
-	if n, ok := d.GetOk("zoneId"); ok {
-		zoneId = n.(string)
+	var zoneid string
+
+	if n, ok := d.GetOk("zoneid"); ok {
+		zoneid = n.(string)
 	}
-	if n, ok := d.GetOk("recordId"); ok {
-		recordId = n.(string)
+
+	if zoneid == "" {
+		return fmt.Errorf("%s must be provided", "zoneid")
 	}
-	if zoneId == "" {
-		return fmt.Errorf("%s must be provided", "id")
-	}
-	if recordId == "" {
-		return fmt.Errorf("%s must be provided", "id")
-	}
-	log.Printf("[INFO] Reading VinylDNS Recordset %s,%s", zoneId, recordId)
-	z, err := meta.(*vinyldns.Client).RecordSet(zoneId, recordId)
+
+	log.Printf("[INFO] Reading VinylDNS Recordset %s", zoneid)
+	z, err := meta.(*vinyldns.Client).RecordSets(zoneid)
 	if err != nil {
 		return err
 	}
-	d.SetId(z.ID)
-	d.Set("name", z.Name)
-	d.Set("type", z.Type)
-	d.Set("ttl", z.TTL)
-	d.Set("zoneName", z.ZoneName)
-	d.Set("records", z.Records)
-	d.Set("isShared", z.IsShared)
-	d.Set("ownerGroupId", z.OwnerGroupID)
+	elementMap := make(map[int]vinyldns.RecordSet)
+	//mapString := make(map[string]interface{})
+	for i, num := range z {
+		elementMap[i] = num
+	}
+	// for key, value := range elementMap {
+	// 	strKey := fmt.Sprintf("%v", key)
+	// 	strValue := fmt.Sprintf("%v", value)
 
+	// 	mapString[strKey] = strValue
+	// }
+
+	s := fmt.Sprintf("%v", elementMap)
+
+	d.SetId(zoneid)
+	d.Set("zoneid", zoneid)
+	d.Set("recordset", s)
 	return nil
 }

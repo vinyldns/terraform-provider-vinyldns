@@ -5,8 +5,8 @@ Use this data source to retrieve the `name`, `email`, and `description` for a gr
 ## Example Usage
 
 ```hcl
-data "vinyldns_zone" "test" {
-  name = "foo"
+data "vinyldns_group" "test" {
+  id = "foo"
 }
 ```
 
