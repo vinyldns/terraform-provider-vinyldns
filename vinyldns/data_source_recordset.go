@@ -40,22 +40,14 @@ func dataSourceVinylDNSRecordSetRead(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
-	elementMap := make(map[int]vinyldns.RecordSet)
-	//mapString := make(map[string]interface{})
+	elementMap := make(map[int]string)
 	for i, num := range z {
-		elementMap[i] = num
+		elementMap[i] = fmt.Sprintf("%+v", num)
 	}
-	// for key, value := range elementMap {
-	// 	strKey := fmt.Sprintf("%v", key)
-	// 	strValue := fmt.Sprintf("%v", value)
-
-	// 	mapString[strKey] = strValue
-	// }
-
-	s := fmt.Sprintf("%v", elementMap)
+	recordset := fmt.Sprintf("%+v", elementMap)
 
 	d.SetId(zoneid)
 	d.Set("zoneid", zoneid)
-	d.Set("recordset", s)
+	d.Set("recordset", recordset)
 	return nil
 }

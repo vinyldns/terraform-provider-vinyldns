@@ -11,7 +11,7 @@ import (
 )
 
 func TestAccVinylDNSRecordSetDataSource_basic(t *testing.T) {
-	zoneid := "fbf7a440-891c-441a-ad09-e1cbc861fda1"
+	zoneid := "fbf7a440-891c-441a-ad09-e1cbc861sda2q"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccVinylDNSZoneDataSourcePreCheck(t)

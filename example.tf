@@ -1,3 +1,9 @@
+provider "vinyldns" {
+  host       = "https://dev-api.vinyldns.comcast.net:9443"
+  access_key = "ptHljFIk44mCsyHimys3"
+  secret_key = "3GxCeAviZAJiJ0E7KtVE"
+}
+
 resource "vinyldns_group" "test_group" {
   name       = "terraform-provider-test-group"
   member_ids = ["123"]
@@ -50,7 +56,7 @@ output "description" {
 }
 
 data "vinyldns_record_set" "test_recordset_datasource" {
-  zoneid   = "fbf7a440-891c-441a-ad09-e1cbc861sda2q"
+  zoneid   = "zoneid"
 }
  output "recordset"{
   value = data.vinyldns_record_set.test_recordset_datasource.recordset
