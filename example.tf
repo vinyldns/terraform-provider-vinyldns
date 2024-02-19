@@ -1,8 +1,4 @@
-provider "vinyldns" {
-  host       = "https://dev-api.vinyldns.comcast.net:9443"
-  access_key = "ptHljFIk44mCsyHimys3"
-  secret_key = "3GxCeAviZAJiJ0E7KtVE"
-}
+
 
 resource "vinyldns_group" "test_group" {
   name       = "terraform-provider-test-group"
