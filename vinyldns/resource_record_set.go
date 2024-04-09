@@ -8,9 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -55,7 +54,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set: func(v interface{}) int {
-					return hashcode.String(v.(string))
+					return hashcode(v.(string))
 				},
 			},
 			"record_texts": {
@@ -63,7 +62,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set: func(v interface{}) int {
-					return hashcode.String(v.(string))
+					return hashcode(v.(string))
 				},
 			},
 			"record_nsdnames": {
@@ -71,7 +70,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set: func(v interface{}) int {
-					return hashcode.String(v.(string))
+					return hashcode(v.(string))
 				},
 			},
 			"record_ptrdnames": {
@@ -79,7 +78,7 @@ func resourceVinylDNSRecordSet() *schema.Resource {
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set: func(v interface{}) int {
-					return hashcode.String(v.(string))
+					return hashcode(v.(string))
 				},
 			},
 			"record_cname": {

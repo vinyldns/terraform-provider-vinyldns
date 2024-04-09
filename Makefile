@@ -4,7 +4,7 @@ GO_TARGET=$(ROOT_DIR)/...
 PKG_NAME=vinyldns
 NAME=terraform-provider-vinyldns
 WEBSITE_REPO=github.com/hashicorp/terraform-website
-VINYLDNS_VERSION=0.10.3
+VINYLDNS_VERSION=0.20.0
 
 # Check that the required version of make is being used
 REQ_MAKE_VER:=3.82
@@ -14,7 +14,7 @@ endif
 
 .ONESHELL:
 
-all: start-api test build stop-api
+all: test build
 
 
 .PHONY: start-api

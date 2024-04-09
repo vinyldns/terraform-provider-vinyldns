@@ -17,8 +17,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -52,7 +51,7 @@ func resourceVinylDNSGroup() *schema.Resource {
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set: func(v interface{}) int {
-					return hashcode.String(v.(string))
+					return hashcode(v.(string))
 				},
 			},
 			"admin_ids": &schema.Schema{
@@ -60,7 +59,7 @@ func resourceVinylDNSGroup() *schema.Resource {
 				Required: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Set: func(v interface{}) int {
-					return hashcode.String(v.(string))
+					return hashcode(v.(string))
 				},
 			},
 		},
