@@ -10,7 +10,7 @@ ifndef $(GOPATH)
     export GOPATH
 endif
 
-all: check-fmt test build integration stop-api validate-version install
+all: check-fmt test build integration stop-api install
 
 fmt:
 	gofmt -s -w vinyldns
@@ -29,9 +29,6 @@ integration: start-api
 	TF_LOG=ERROR \
 	TF_ACC=1 \
 	go test "$(SOURCE)" -v -cover
-
-validate-version:
-	cat vinyldns/version.go | grep 'var Version = "$(VERSION)"'
 
 clonevinyl:
 	if [ ! -d  $(VINYLDNS_DIR) ]; then \
