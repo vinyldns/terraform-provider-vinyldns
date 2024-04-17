@@ -2,9 +2,6 @@ module github.com/vinyldns/terraform-provider-vinyldns
 
 go 1.21
 
-// Remove!
-replace github.com/vinyldns/go-vinyldns => ../go-vinyldns
-
 require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.33.0
 	github.com/vinyldns/go-vinyldns v0.9.16 // Must be updated with new version before this can be merged
