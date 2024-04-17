@@ -36,67 +36,67 @@ func resourceVinylDNSZone() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"email": &schema.Schema{
+			"email": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"admin_group_id": &schema.Schema{
+			"admin_group_id": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"status": &schema.Schema{
+			"status": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"shared": &schema.Schema{
+			"shared": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
-			"created": &schema.Schema{
+			"created": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"updated": &schema.Schema{
+			"updated": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"latest_sync": &schema.Schema{
+			"latest_sync": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"transfer_connection": connectionSchema(),
 			"zone_connection":     connectionSchema(),
-			"acl_rule": &schema.Schema{
+			"acl_rule": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"access_level": &schema.Schema{
+						"access_level": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
-						"record_mask": &schema.Schema{
+						"record_mask": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"user_id": &schema.Schema{
+						"user_id": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"group_id": &schema.Schema{
+						"group_id": {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"description": &schema.Schema{
+						"description": {
 							Type:     schema.TypeString,
 							Optional: true,
 							Default:  "Managed by Terraform",
 						},
-						"record_types": &schema.Schema{
+						"record_types": {
 							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Schema{
@@ -377,19 +377,19 @@ func connectionSchema() *schema.Schema {
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				"name": &schema.Schema{
+				"name": {
 					Type:     schema.TypeString,
 					Required: true,
 				},
-				"key": &schema.Schema{
+				"key": {
 					Type:     schema.TypeString,
 					Required: true,
 				},
-				"key_name": &schema.Schema{
+				"key_name": {
 					Type:     schema.TypeString,
 					Required: true,
 				},
-				"primary_server": &schema.Schema{
+				"primary_server": {
 					Type:     schema.TypeString,
 					Required: true,
 				},
