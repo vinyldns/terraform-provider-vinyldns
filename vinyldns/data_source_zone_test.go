@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -24,7 +24,7 @@ func TestAccVinylDNSZoneDataSource_basic(t *testing.T) {
 					resource.TestCheckResourceAttrSet("data.vinyldns_zone.test", "name"),
 					resource.TestCheckResourceAttrSet("data.vinyldns_zone.test", "admin_group_id"),
 					resource.TestCheckResourceAttr("data.vinyldns_zone.test", "name", name),
-					resource.TestCheckResourceAttr("data.vinyldns_zone.test", "email", "foo@email.com"),
+					resource.TestCheckResourceAttr("data.vinyldns_zone.test", "email", "foo@test.com"),
 				),
 			},
 		},
@@ -36,13 +36,13 @@ func testAccVinylDNSZoneDataSourcePreCheck(t *testing.T) error {
 	client := vinyldns.NewClientFromEnv()
 	g, err := client.GroupCreate(&vinyldns.Group{
 		Name:  "terraformdatasourcetestgroup",
-		Email: "foo@email.com",
+		Email: "foo@test.com",
 		Members: []vinyldns.User{
-			vinyldns.User{
+			{
 				ID: "ok",
 			}},
 		Admins: []vinyldns.User{
-			vinyldns.User{
+			{
 				ID: "ok",
 			}},
 	})
@@ -54,13 +54,13 @@ func testAccVinylDNSZoneDataSourcePreCheck(t *testing.T) error {
 
 	z, err := client.ZoneCreate(&vinyldns.Zone{
 		Name:         "ok.",
-		Email:        "foo@email.com",
+		Email:        "foo@test.com",
 		AdminGroupID: g.ID,
 		Connection: &vinyldns.ZoneConnection{
 			Name:          "vinyldns.",
 			Key:           "nzisn+4G2ldMn0q1CV3vsg==",
 			KeyName:       "vinyldns.",
-			PrimaryServer: "localhost:19001",
+			PrimaryServer: "vinyldns-integration:19001",
 		},
 	})
 	if err != nil {

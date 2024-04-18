@@ -15,26 +15,25 @@ package vinyldns
 import (
 	"os"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
 // Provider returns a schema.Provider for VinylDNS.
-func Provider() terraform.ResourceProvider {
+func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"access_key": &schema.Schema{
+			"access_key": {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: envDefaultFunc("VINYLDNS_ACCESS_KEY"),
 			},
-			"secret_key": &schema.Schema{
+			"secret_key": {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: envDefaultFunc("VINYLDNS_SECRET_KEY"),
 			},
-			"host": &schema.Schema{
+			"host": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: envDefaultFunc("VINYLDNS_HOST"),

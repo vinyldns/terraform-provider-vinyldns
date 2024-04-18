@@ -14,9 +14,10 @@ package vinyldns
 
 import (
 	"fmt"
+	"hash/crc32"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func stringSetToStringSlice(stringSet *schema.Set) []string {
@@ -43,4 +44,17 @@ func parseTwoPartID(id string) (string, string, error) {
 // vinyldns responds 400 to IPv6 addresses represented within `[` `]`
 func removeBrackets(str string) string {
 	return strings.Replace(strings.Replace(str, "[", "", -1), "]", "", -1)
+}
+
+// replaces terraform SDK hashcode function
+func hashcode(s string) int {
+	v := int(crc32.ChecksumIEEE([]byte(s)))
+	if v >= 0 {
+		return v
+	}
+	if -v >= 0 {
+		return -v
+	}
+	// v == MinInt
+	return 0
 }

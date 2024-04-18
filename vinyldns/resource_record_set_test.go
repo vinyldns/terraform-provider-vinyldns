@@ -16,8 +16,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -27,7 +27,7 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccVinylDNSRecordSetDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccVinylDNSRecordSetConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVinylDNSRecordSetExists("vinyldns_record_set.test_a_record_set"),
@@ -39,9 +39,8 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "type", "A"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.#", "2"),
-					// NOTE: the following will fail if ever the record_addresses values change, as these indexes are hashes of 127.0.0.2 and 127.0.0.1, respectively
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.1321121298", "127.0.0.2"),
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.3619153832", "127.0.0.1"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.0", "127.0.0.1"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.1", "127.0.0.2"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "name", "cname-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "type", "CNAME"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "ttl", "6000"),
@@ -50,44 +49,42 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "type", "TXT"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "record_texts.#", "1"),
-					// NOTE: the following will fail if ever record_texts is something other than ["some-text"], as 3073014027 is a hash of some-text
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "record_texts.3073014027", "some-text"),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "record_texts.0", "some-text"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "name", "ns-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "type", "NS"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "name", "10"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.#", "1"),
-					// NOTE: the following will fail if ever ptrd_names is something other than ["ptr.terraformtestrecordset."], as 3198432272 is a hash of ptr.terraformtestrecordset.
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.3198432272", "ptr.terraformtestrecordset."),
+					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.0", "ptr.terraformtestrecordset."),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "type", "PTR"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "ttl", "6000"),
 				),
 			},
-			resource.TestStep{
+			{
 				ResourceName:      "vinyldns_record_set.test_a_record_set",
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateCheck:  testAccVinylDNSRecordSetImportARecordStateCheck,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      "vinyldns_record_set.test_cname_record_set",
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateCheck:  testAccVinylDNSRecordSetImportCNAMERecordStateCheck,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      "vinyldns_record_set.test_txt_record_set",
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateCheck:  testAccVinylDNSRecordSetImportTXTRecordStateCheck,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      "vinyldns_record_set.test_ns_record_set",
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateCheck:  testAccVinylDNSRecordSetImportNSRecordStateCheck,
 			},
-			resource.TestStep{
+			{
 				ResourceName:      "vinyldns_record_set.test_ptr_record_set",
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -103,13 +100,13 @@ func TestAccVinylDNSRecordSetMoveZones(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccVinylDNSRecordSetDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccVinylDNSRecordSetConfigMoveZones("1"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVinylDNSRecordSetMoveZonesExists("vinyldns_record_set.test_a_record_set"),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccVinylDNSRecordSetConfigMoveZones("2"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckVinylDNSRecordSetMoveZonesUpdatedExistsInNewZone("vinyldns_record_set.test_a_record_set"),
@@ -263,7 +260,7 @@ func testAccVinylDNSRecordSetImportPTRRecordStateCheck(s []*terraform.InstanceSt
 	}
 
 	expPTRDName := "ptr.terraformtestrecordset."
-	ptrdName := rs.Attributes["record_ptrdnames.3198432272"]
+	ptrdName := rs.Attributes["record_ptrdnames.0"]
 	if ptrdName != expPTRDName {
 		return fmt.Errorf("expected record_ptrdname attribute to be %s, received %s", expPTRDName, ptrdName)
 	}
@@ -375,14 +372,14 @@ const testAccVinylDNSRecordSetConfigBasic = `
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgroup"
 	description = "some description"
-	email = "tftest@tf.com"
+	email = "tftest@test.com"
 	member_ids = ["ok"]
 	admin_ids = ["ok"]
 }
 
 resource "vinyldns_zone" "test_zone" {
 	name = "system-test."
-	email = "foo@bar.com"
+	email = "foo@test.com"
 	admin_group_id = "${vinyldns_group.test_group.id}"
 	depends_on = [
 		"vinyldns_group.test_group"
@@ -436,7 +433,7 @@ resource "vinyldns_record_set" "test_ns_record_set" {
 
 resource "vinyldns_zone" "test_reverse_zone" {
 	name = "2.0.192.in-addr.arpa."
-	email = "foo@bar.com"
+	email = "foo@test.com"
 	admin_group_id = "${vinyldns_group.test_group.id}"
 	depends_on = [
 		"vinyldns_group.test_group"
@@ -459,20 +456,20 @@ func testAccVinylDNSRecordSetConfigMoveZones(z string) string {
 resource "vinyldns_group" "test_group" {
 	name = "terraformtestgrouptwo"
 	description = "some description"
-	email = "tftest@tf.com"
+	email = "tftest@test.com"
 	member_ids = ["ok"]
 	admin_ids = ["ok"]
 }
 
 resource "vinyldns_zone" "test_zone_1" {
 	name = "system-test."
-	email = "foo@bar.com"
+	email = "foo@test.com"
 	admin_group_id = "${vinyldns_group.test_group.id}"
 }
 
 resource "vinyldns_zone" "test_zone_2" {
 	name = "vinyldns."
-	email = "foo@bar.com"
+	email = "foo@test.com"
 	admin_group_id = "${vinyldns_group.test_group.id}"
 }
 
