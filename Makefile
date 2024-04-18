@@ -4,6 +4,7 @@ NAME=terraform-provider-vinyldns
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 VINYLDNS_REPO=github.com/vinyldns/vinyldns
 VINYLDNS_DIR="$(GOPATH)/src/$(VINYLDNS_REPO)"
+VINYLDNS_VERSION=latest
 
 ifndef $(GOPATH)
     GOPATH=$(shell go env GOPATH)
@@ -42,7 +43,7 @@ clonevinyl:
 
 start-api: clonevinyl stop-api
 	$(GOPATH)/src/$(VINYLDNS_REPO)/quickstart/quickstart-vinyldns.sh \
-		--api
+		--api --version-tag $(VINYLDNS_VERSION)
 
 stop-api:
 	$(GOPATH)/src/$(VINYLDNS_REPO)/quickstart/quickstart-vinyldns.sh \
