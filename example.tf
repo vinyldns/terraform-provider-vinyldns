@@ -1,3 +1,5 @@
+
+
 resource "vinyldns_group" "test_group" {
   name       = "terraform-provider-test-group"
   member_ids = ["123"]
@@ -32,3 +34,26 @@ resource "vinyldns_record_set" "another_test_record_set" {
   ttl          = 6000
   record_cname = "foo-bar.com."
 }
+
+data "vinyldns_group" "test_group_datasource" {
+  id = vinyldns_group.test_group.id
+}
+
+output "name" {
+  value = data.vinyldns_group.test_group_datasource.name
+}
+
+output "email" {
+  value = data.vinyldns_group.test_group_datasource.email
+}
+
+output "description" {
+  value = data.vinyldns_group.test_group_datasource.description
+}
+
+data "vinyldns_record_set" "test_recordset_datasource" {
+  zoneid   = "zoneid"
+}
+ output "recordset"{
+  value = data.vinyldns_record_set.test_recordset_datasource.recordset
+ }
