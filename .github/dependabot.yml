@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # Keep gomod dependencies up to date
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "area/dependencies"
+      - "kind/maintenance"
+      - "status/needs-triage"
