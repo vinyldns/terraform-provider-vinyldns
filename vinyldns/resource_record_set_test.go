@@ -14,6 +14,7 @@ package vinyldns
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -259,10 +260,26 @@ func testAccVinylDNSRecordSetImportPTRRecordStateCheck(s []*terraform.InstanceSt
 		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
 	}
 
+	// record_ptrdnames is a TypeSet, so the index key is a hash and not stable.
+	// Verify there is exactly one element and that its value is the expected PTRDName.
 	expPTRDName := "ptr.terraformtestrecordset."
-	ptrdName := rs.Attributes["record_ptrdnames.3198432272"]
-	if ptrdName != expPTRDName {
-		return fmt.Errorf("expected record_ptrdname attribute to be %s, received %s", expPTRDName, ptrdName)
+	if rs.Attributes["record_ptrdnames.#"] != "1" {
+		return fmt.Errorf("expected record_ptrdnames.# to be 1, received %s", rs.Attributes["record_ptrdnames.#"])
+	}
+
+	found := false
+	for k, v := range rs.Attributes {
+		if !strings.HasPrefix(k, "record_ptrdnames.") || k == "record_ptrdnames.#" {
+			continue
+		}
+		if v == expPTRDName {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("expected record_ptrdnames to contain %s, state: %#v", expPTRDName, rs.Attributes)
 	}
 
 	return nil
