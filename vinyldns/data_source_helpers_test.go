@@ -56,7 +56,7 @@ func ensureTestZone(client *vinyldns.Client, name, adminGroupID string) (*vinyld
 			Name:          "vinyldns.",
 			Key:           "nzisn+4G2ldMn0q1CV3vsg==",
 			KeyName:       "vinyldns.",
-			PrimaryServer: "localhost:19001",
+			PrimaryServer: testPrimaryServer(),
 		},
 	})
 	if err != nil {

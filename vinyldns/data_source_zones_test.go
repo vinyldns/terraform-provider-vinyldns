@@ -9,7 +9,7 @@ import (
 )
 
 func TestAccVinylDNSZonesDataSource_basic(t *testing.T) {
-	zoneName := "terraformdatasourcezone."
+	zoneName := testZoneName()
 	groupName := "terraformdatasourcezonegroup"
 
 	resource.Test(t, resource.TestCase{
@@ -33,6 +33,9 @@ func TestAccVinylDNSZonesDataSource_basic(t *testing.T) {
 
 func testAccVinylDNSZonesDataSourcePreCheck(t *testing.T, groupName, zoneName string) error {
 	client := vinyldns.NewClientFromEnv()
+	if _, err := client.ZoneByName(zoneName); err == nil {
+		return nil
+	}
 	group, err := ensureTestGroup(client, groupName)
 	if err != nil {
 		return err

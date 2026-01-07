@@ -9,7 +9,7 @@ import (
 )
 
 func TestAccVinylDNSRecordSetsDataSource_basic(t *testing.T) {
-	zoneName := "terraformdatasourcezone."
+	zoneName := testZoneName()
 	groupName := "terraformdatasourcezonegroup"
 	recordSetName := "terraformdatasourcerecordset"
 
@@ -34,14 +34,18 @@ func TestAccVinylDNSRecordSetsDataSource_basic(t *testing.T) {
 
 func testAccVinylDNSRecordSetsDataSourcePreCheck(t *testing.T, groupName, zoneName, recordSetName string) error {
 	client := vinyldns.NewClientFromEnv()
-	group, err := ensureTestGroup(client, groupName)
-	if err != nil {
-		return err
-	}
+	zone, err := client.ZoneByName(zoneName)
+	if err != nil || zone.ID == "" {
+		group, gErr := ensureTestGroup(client, groupName)
+		if gErr != nil {
+			return gErr
+		}
 
-	zone, err := ensureTestZone(client, zoneName, group.ID)
-	if err != nil {
-		return err
+		zonePtr, zErr := ensureTestZone(client, zoneName, group.ID)
+		if zErr != nil {
+			return zErr
+		}
+		zone = *zonePtr
 	}
 
 	if err := ensureTestRecordSet(client, zone.ID, recordSetName); err != nil {
