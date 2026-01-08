@@ -1,11 +1,11 @@
 # List all available backend IDs
-# Backend IDs identify the DNS backends configured in VinylDNS
+# Backend IDs identify DNS backends that zones can reference (backends are managed outside Terraform)
 data "vinyldns_backend_ids" "available" {}
 
 # Output the available backends
 output "available_backends" {
   value       = data.vinyldns_backend_ids.available.backend_ids
-  description = "List of DNS backend IDs configured in VinylDNS"
+  description = "List of DNS backend IDs known to VinylDNS"
 }
 
 # Check if a specific backend exists

@@ -74,7 +74,7 @@ resource "vinyldns_record_set" "www" {
 - `vinyldns_group` - Look up a group by name
 - `vinyldns_groups` - List groups with optional filtering
 - `vinyldns_record_sets` - List record sets in a zone
-- `vinyldns_backend_ids` - List available DNS backend IDs
+- `vinyldns_backend_ids` - List available DNS backend IDs (for zone references; backends are managed outside Terraform)
 
 ## Examples
 
@@ -150,4 +150,3 @@ and their corresponding licenses:
 * [github.com/hashicorp/logutils](https://github.com/hashicorp/logutils) - Mozilla Public License 2.0
 * [github.com/hashicorp/terraform](github.com/hashicorp/terraform) - Mozilla Public License 2.0
 * [github.com/hashicorp/yamux](https://github.com/hashicorp/yamux) - Mozilla Public License 2.0
-

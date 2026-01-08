@@ -75,7 +75,7 @@ provider "vinyldns" {
 
 ## Argument Reference
 
-* `host` - (Required) The VinylDNS API endpoint URL. May also be set via the `VINYLDNS_HOST` environment variable.
+* `host` - (Required) The VinylDNS API endpoint URL. May also be set via the `VINYLDNS_HOST` environment variable instead of inline configuration.
 
 * `access_key` - (Required) The access key for VinylDNS API authentication. May also be set via the `VINYLDNS_ACCESS_KEY` environment variable.
 

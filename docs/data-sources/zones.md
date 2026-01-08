@@ -41,7 +41,7 @@ output "active_zones" {
 
 ## Argument Reference
 
-* `name_filter` - (Optional) A string to filter zone names. Only zones containing this string in their name will be returned.
+* `name_filter` - (Optional) A zone name filter. VinylDNS supports `*` wildcards (e.g., `prod*`, `*corp*`). Without a wildcard, VinylDNS treats this as a prefix match unless you provide the full zone name with a trailing dot for an exact match.
 
 ## Attribute Reference
 

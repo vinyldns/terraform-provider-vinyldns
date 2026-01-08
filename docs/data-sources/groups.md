@@ -34,7 +34,7 @@ output "dns_teams" {
 
 ## Argument Reference
 
-* `name_filter` - (Optional) A string to filter group names. Only groups containing this string in their name will be returned.
+* `name_filter` - (Optional) A substring filter for group names. VinylDNS performs a contains search; wildcards and regex are not supported.
 
 ## Attribute Reference
 

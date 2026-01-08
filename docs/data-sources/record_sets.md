@@ -65,7 +65,7 @@ output "cname_records" {
 
 * `zone_id` - (Required) The ID of the zone to list record sets from.
 
-* `name_filter` - (Optional) A string to filter record set names. Only record sets containing this string in their name will be returned.
+* `name_filter` - (Optional) A record name filter within the zone. VinylDNS supports `*` wildcards (e.g., `api*`). Without a wildcard, VinylDNS treats this as an exact record name match.
 
 ## Attribute Reference
 

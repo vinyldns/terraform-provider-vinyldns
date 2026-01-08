@@ -50,7 +50,7 @@ resource "vinyldns_record_set" "alias" {
 
 # TXT record (single value)
 resource "vinyldns_record_set" "spf" {
-  name         = "@"
+  name         = "example.com."
   zone_id      = vinyldns_zone.example.id
   type         = "TXT"
   ttl          = 3600

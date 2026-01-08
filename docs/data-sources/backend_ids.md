@@ -1,6 +1,6 @@
 # vinyldns_backend_ids (Data Source)
 
-Use this data source to list the available DNS backend IDs configured in VinylDNS. Backend IDs identify the DNS backends (servers) that VinylDNS can manage.
+Use this data source to list the available DNS backend IDs known to VinylDNS. These IDs identify DNS backends that zones can reference; this provider does not manage backends themselves.
 
 ## Example Usage
 
@@ -30,4 +30,4 @@ This data source has no arguments.
 
 ## Attribute Reference
 
-* `backend_ids` - A list of backend ID strings representing the DNS backends configured in VinylDNS.
+* `backend_ids` - A list of backend ID strings representing the DNS backends known to VinylDNS (backends are managed outside Terraform).
