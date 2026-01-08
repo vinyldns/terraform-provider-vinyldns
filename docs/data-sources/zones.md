@@ -1,28 +1,62 @@
-# vinyldns_zones
+# vinyldns_zones (Data Source)
 
-Use this data source to list zones, optionally filtered by name.
+Use this data source to list VinylDNS zones, optionally filtered by name.
 
 ## Example Usage
+
+### List All Zones
 
 ```hcl
 data "vinyldns_zones" "all" {}
 
-data "vinyldns_zones" "filtered" {
-  name_filter = "prod."
+output "zone_names" {
+  value = [for z in data.vinyldns_zones.all.zones : z.name]
 }
 ```
 
-## Arguments Reference
+### List Zones Matching a Filter
 
-* `name_filter` - (Optional) Filter zones by name.
+```hcl
+data "vinyldns_zones" "production" {
+  name_filter = "prod"
+}
 
-## Attributes Reference
+output "production_zones" {
+  value = data.vinyldns_zones.production.zones
+}
+```
 
-* `zones` - List of matching zones. Each zone includes:
-  * `id` - The zone ID.
-  * `name` - The zone name.
-  * `email` - The zone email.
-  * `admin_group_id` - The admin group ID.
-  * `status` - The zone status.
-  * `shared` - Whether the zone is shared.
-  * `backend_id` - The backend ID.
+### Find Active Zones
+
+```hcl
+data "vinyldns_zones" "all" {}
+
+output "active_zones" {
+  value = [
+    for z in data.vinyldns_zones.all.zones : z.name
+    if z.status == "Active"
+  ]
+}
+```
+
+## Argument Reference
+
+* `name_filter` - (Optional) A string to filter zone names. Only zones containing this string in their name will be returned.
+
+## Attribute Reference
+
+* `zones` - A list of zones. Each zone has the following attributes:
+
+  * `id` - The unique identifier of the zone.
+
+  * `name` - The name of the zone.
+
+  * `email` - The email address associated with the zone.
+
+  * `admin_group_id` - The ID of the group that administers the zone.
+
+  * `status` - The zone status (e.g., `Active`, `Syncing`).
+
+  * `shared` - Whether the zone is a shared zone.
+
+  * `backend_id` - The ID of the DNS backend for this zone.

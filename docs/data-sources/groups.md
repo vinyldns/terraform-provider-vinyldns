@@ -1,27 +1,53 @@
-# vinyldns_groups
+# vinyldns_groups (Data Source)
 
-Use this data source to list groups, optionally filtered by name.
+Use this data source to list VinylDNS groups, optionally filtered by name.
 
 ## Example Usage
+
+### List All Groups
 
 ```hcl
 data "vinyldns_groups" "all" {}
 
-data "vinyldns_groups" "filtered" {
-  name_filter = "admins"
+output "group_names" {
+  value = [for g in data.vinyldns_groups.all.groups : g.name]
 }
 ```
 
-## Arguments Reference
+### List Groups Matching a Filter
 
-* `name_filter` - (Optional) Filter groups by name.
+```hcl
+data "vinyldns_groups" "dns_teams" {
+  name_filter = "dns"
+}
 
-## Attributes Reference
+output "dns_teams" {
+  value = [
+    for g in data.vinyldns_groups.dns_teams.groups : {
+      name         = g.name
+      email        = g.email
+      member_count = length(g.member_ids)
+    }
+  ]
+}
+```
 
-* `groups` - List of matching groups. Each group includes:
-  * `id` - The group ID.
-  * `name` - The group name.
-  * `email` - The email associated with the group.
-  * `description` - The group description.
-  * `member_ids` - The member user IDs.
-  * `admin_ids` - The admin user IDs.
+## Argument Reference
+
+* `name_filter` - (Optional) A string to filter group names. Only groups containing this string in their name will be returned.
+
+## Attribute Reference
+
+* `groups` - A list of groups. Each group has the following attributes:
+
+  * `id` - The unique identifier of the group.
+
+  * `name` - The name of the group.
+
+  * `email` - The email address associated with the group.
+
+  * `description` - The description of the group.
+
+  * `member_ids` - A set of user IDs who are members of the group.
+
+  * `admin_ids` - A set of user IDs who are administrators of the group.

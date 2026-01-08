@@ -1,23 +1,41 @@
-# vinyldns_zone
+# vinyldns_zone (Data Source)
 
-Use this data source to retrieve the `id`, `email`, and `admin_group_id` for a zone.
+Use this data source to look up an existing VinylDNS zone by name.
 
 ## Example Usage
 
+### Look Up a Zone
+
 ```hcl
-data "vinyldns_zone" "test" {
-  name = "foo"
+data "vinyldns_zone" "example" {
+  name = "example.com."
 }
 ```
 
-## Arguments Reference
+### Create a Record in an Existing Zone
 
-* `name` - (Required) The name of the zone.
+```hcl
+data "vinyldns_zone" "example" {
+  name = "example.com."
+}
 
-## Attributes Reference
+resource "vinyldns_record_set" "new_record" {
+  name             = "new-host"
+  zone_id          = data.vinyldns_zone.example.id
+  type             = "A"
+  ttl              = 300
+  record_addresses = ["192.0.2.100"]
+}
+```
 
-* `id` - The ID of the zone
+## Argument Reference
 
-* `admin_group_id` - The ID of the zone's admin group
+* `name` - (Required) The name of the zone to look up.
 
-* `email` - The email associated with the zone
+## Attribute Reference
+
+* `id` - The unique identifier of the zone.
+
+* `email` - The email address associated with the zone.
+
+* `admin_group_id` - The ID of the group that administers the zone.
