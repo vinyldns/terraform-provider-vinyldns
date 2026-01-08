@@ -50,6 +50,7 @@ func Provider() terraform.ResourceProvider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"vinyldns_zone":        dataSourceVinylDNSZone(),
 			"vinyldns_group":       dataSourceVinylDNSGroup(),
+			"vinyldns_groups":      dataSourceVinylDNSGroups(),
 			"vinyldns_zones":       dataSourceVinylDNSZones(),
 			"vinyldns_record_sets": dataSourceVinylDNSRecordSets(),
 			"vinyldns_backend_ids": dataSourceVinylDNSBackendIDs(),

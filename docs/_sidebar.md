@@ -1,6 +1,7 @@
 - Data Sources
 
   - [vinyldns_group](data-sources/group.md)
+  - [vinyldns_groups](data-sources/groups.md)
   - [vinyldns_zones](data-sources/zones.md)
   - [vinyldns_record_sets](data-sources/record_sets.md)
   - [vinyldns_backend_ids](data-sources/backend_ids.md)
