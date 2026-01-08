@@ -133,4 +133,21 @@ Apache 2.0 - See [LICENSE](./LICENSE) for details.
 
 ## Credits
 
-`terraform-provider-vinyldns` builds upon many open source packages. See the full list in the source code.
+`terraform-provider-vinyldns` would not be possible without the help of many other pieces of open source software. Thank
+you open source world!
+
+Given the Apache 2.0 license of `terraform-provider-vinyldns`, we specifically want to call out the following packages
+and their corresponding licenses:
+
+* [github.com/hashicorp/errwrap](https://github.com/hashicorp/errwrap) - Mozilla Public License 2.0
+* [github.com/hashicorp/go-getter](https://github.com/hashicorp/go-getter) - Mozilla Public License 2.0
+* [github.com/hashicorp/go-multierror](https://github.com/hashicorp/go-multierror) - Mozilla Public License 2.0
+* [github.com/hashicorp/go-plugin](https://github.com/hashicorp/go-plugin) - Mozilla Public License 2.0
+* [github.com/hashicorp/go-uuid](https://github.com/hashicorp/go-uuid) - Mozilla Public License 2.0
+* [github.com/hashicorp/go-version](https://github.com/hashicorp/go-version) - Mozilla Public License 2.0
+* [github.com/hashicorp/hcl](https://github.com/hashicorp/hcl) - Mozilla Public License 2.0
+* [github.com/hashicorp/hil](https://github.com/hashicorp/hil) - Mozilla Public License 2.0
+* [github.com/hashicorp/logutils](https://github.com/hashicorp/logutils) - Mozilla Public License 2.0
+* [github.com/hashicorp/terraform](github.com/hashicorp/terraform) - Mozilla Public License 2.0
+* [github.com/hashicorp/yamux](https://github.com/hashicorp/yamux) - Mozilla Public License 2.0
+
