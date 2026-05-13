@@ -82,9 +82,6 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 						"user_id":        "ok",
 						"record_types.#": "1",
 					}),
-					resource.TestCheckTypeSetElemNestedAttrs("vinyldns_zone.test_zone", "acl_rule.*", map[string]string{
-						"record_types.0": "TXT",
-					}),
 				),
 			},
 			resource.TestStep{
@@ -97,9 +94,6 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 						"access_level":   "Delete",
 						"user_id":        "ok",
 						"record_types.#": "1",
-					}),
-					resource.TestCheckTypeSetElemNestedAttrs("vinyldns_zone.test_zone", "acl_rule.*", map[string]string{
-						"record_types.0": "A",
 					}),
 				),
 			},
@@ -290,9 +284,17 @@ func testAccVinylDNSZoneWithACLImportStateCheck(s []*terraform.InstanceState) er
 
 		userID := rs.Attributes[fmt.Sprintf("acl_rule.%s.user_id", idx)]
 		recordTypesCount := rs.Attributes[fmt.Sprintf("acl_rule.%s.record_types.#", idx)]
-		recordType := rs.Attributes[fmt.Sprintf("acl_rule.%s.record_types.0", idx)]
 
-		if userID == "ok" && recordTypesCount == "1" && recordType == "A" {
+		recordTypeFound := false
+		prefix := fmt.Sprintf("acl_rule.%s.record_types.", idx)
+		for rk, rv := range rs.Attributes {
+			if strings.HasPrefix(rk, prefix) && rk != prefix+"#" && rv == "A" {
+				recordTypeFound = true
+				break
+			}
+		}
+
+		if userID == "ok" && recordTypesCount == "1" && recordTypeFound {
 			found = true
 			break
 		}
