@@ -9,4 +9,12 @@ ignore:
     - '*':
         reason: No fixed version is available in the upstream HashiCorp Terraform provider dependency chain; tracking until terraform-plugin-go adopts a remediated msgpack package.
         expires: 2026-11-13T00:00:00.000Z
+  SNYK-GOLANG-GITHUBCOMGOGITGOGITV6PLUMBINGOBJECT-16638688:
+    - '*':
+        reason: The only published remediation is go-git v6.0.0-alpha.3, and the dependency is only introduced through stable HashiCorp Terraform tooling that does not consume the v6 alpha line.
+        expires: 2026-11-13T00:00:00.000Z
+  SNYK-GOLANG-GITHUBCOMGOGITGOGITV4PLUMBINGFORMATINDEX-15855247:
+    - '*':
+        reason: The upstream go-git advisory states the fix is only on master and has not been published, so there is no stable version available to select through the HashiCorp Terraform dependency chain yet.
+        expires: 2026-11-13T00:00:00.000Z
 patch: {}
