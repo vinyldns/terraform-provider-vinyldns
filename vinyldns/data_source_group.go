@@ -66,9 +66,15 @@ func dataSourceVinylDNSGroupRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	d.SetId(match.ID)
-	d.Set("name", match.Name)
-	d.Set("email", match.Email)
-	d.Set("description", match.Description)
+	if err := d.Set("name", match.Name); err != nil {
+		return fmt.Errorf("error setting name for group %s: %s", match.ID, err)
+	}
+	if err := d.Set("email", match.Email); err != nil {
+		return fmt.Errorf("error setting email for group %s: %s", match.ID, err)
+	}
+	if err := d.Set("description", match.Description); err != nil {
+		return fmt.Errorf("error setting description for group %s: %s", match.ID, err)
+	}
 
 	memIDs := make([]interface{}, 0, len(match.Members))
 	for _, m := range match.Members {

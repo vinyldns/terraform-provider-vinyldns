@@ -84,8 +84,8 @@ func dataSourceVinylDNSGroupsRead(d *schema.ResourceData, meta interface{}) erro
 			"name":        group.Name,
 			"email":       group.Email,
 			"description": group.Description,
-			"member_ids":  memberIDs,
-			"admin_ids":   adminIDs,
+			"member_ids":  schema.NewSet(schema.HashString, memberIDs),
+			"admin_ids":   schema.NewSet(schema.HashString, adminIDs),
 		})
 	}
 
