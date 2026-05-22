@@ -18,8 +18,8 @@ import (
 
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func TestAccVinylDNSGroupBasic(t *testing.T) {
@@ -35,9 +35,9 @@ func TestAccVinylDNSGroupBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "name", "terraformtestgroup"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "description", "description"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "member_ids.#", "1"),
-					resource.TestCheckResourceAttr("vinyldns_group.test_group", "member_ids.2044517703", "ok"),
+					resource.TestCheckTypeSetElemAttr("vinyldns_group.test_group", "member_ids.*", "ok"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "admin_ids.#", "1"),
-					resource.TestCheckResourceAttr("vinyldns_group.test_group", "admin_ids.2044517703", "ok"),
+					resource.TestCheckTypeSetElemAttr("vinyldns_group.test_group", "admin_ids.*", "ok"),
 				),
 			},
 			resource.TestStep{
@@ -47,9 +47,9 @@ func TestAccVinylDNSGroupBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "name", "terraformtestgroup"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "description", "updated description"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "member_ids.#", "1"),
-					resource.TestCheckResourceAttr("vinyldns_group.test_group", "member_ids.2044517703", "ok"),
+					resource.TestCheckTypeSetElemAttr("vinyldns_group.test_group", "member_ids.*", "ok"),
 					resource.TestCheckResourceAttr("vinyldns_group.test_group", "admin_ids.#", "1"),
-					resource.TestCheckResourceAttr("vinyldns_group.test_group", "admin_ids.2044517703", "ok"),
+					resource.TestCheckTypeSetElemAttr("vinyldns_group.test_group", "admin_ids.*", "ok"),
 				),
 			},
 			resource.TestStep{

@@ -14,10 +14,11 @@ package vinyldns
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -39,9 +40,8 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "type", "A"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.#", "2"),
-					// NOTE: the following will fail if ever the record_addresses values change, as these indexes are hashes of 127.0.0.2 and 127.0.0.1, respectively
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.1321121298", "127.0.0.2"),
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_a_record_set", "record_addresses.3619153832", "127.0.0.1"),
+					resource.TestCheckTypeSetElemAttr("vinyldns_record_set.test_a_record_set", "record_addresses.*", "127.0.0.1"),
+					resource.TestCheckTypeSetElemAttr("vinyldns_record_set.test_a_record_set", "record_addresses.*", "127.0.0.2"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "name", "cname-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "type", "CNAME"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_cname_record_set", "ttl", "6000"),
@@ -50,15 +50,13 @@ func TestAccVinylDNSRecordSetBasic(t *testing.T) {
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "type", "TXT"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "record_texts.#", "1"),
-					// NOTE: the following will fail if ever record_texts is something other than ["some-text"], as 3073014027 is a hash of some-text
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_txt_record_set", "record_texts.3073014027", "some-text"),
+					resource.TestCheckTypeSetElemAttr("vinyldns_record_set.test_txt_record_set", "record_texts.*", "some-text"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "name", "ns-terraformtestrecordset"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "type", "NS"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ns_record_set", "ttl", "6000"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "name", "10"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.#", "1"),
-					// NOTE: the following will fail if ever ptrd_names is something other than ["ptr.terraformtestrecordset."], as 3198432272 is a hash of ptr.terraformtestrecordset.
-					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.3198432272", "ptr.terraformtestrecordset."),
+					resource.TestCheckTypeSetElemAttr("vinyldns_record_set.test_ptr_record_set", "record_ptrdnames.*", "ptr.terraformtestrecordset."),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "type", "PTR"),
 					resource.TestCheckResourceAttr("vinyldns_record_set.test_ptr_record_set", "ttl", "6000"),
 				),
@@ -262,10 +260,26 @@ func testAccVinylDNSRecordSetImportPTRRecordStateCheck(s []*terraform.InstanceSt
 		return fmt.Errorf("expected ttl attribute to be %s, received %s", expTTL, ttl)
 	}
 
+	// record_ptrdnames is a TypeSet, so the index key is a hash and not stable.
+	// Verify there is exactly one element and that its value is the expected PTRDName.
 	expPTRDName := "ptr.terraformtestrecordset."
-	ptrdName := rs.Attributes["record_ptrdnames.3198432272"]
-	if ptrdName != expPTRDName {
-		return fmt.Errorf("expected record_ptrdname attribute to be %s, received %s", expPTRDName, ptrdName)
+	if rs.Attributes["record_ptrdnames.#"] != "1" {
+		return fmt.Errorf("expected record_ptrdnames.# to be 1, received %s", rs.Attributes["record_ptrdnames.#"])
+	}
+
+	found := false
+	for k, v := range rs.Attributes {
+		if !strings.HasPrefix(k, "record_ptrdnames.") || k == "record_ptrdnames.#" {
+			continue
+		}
+		if v == expPTRDName {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("expected record_ptrdnames to contain %s, state: %#v", expPTRDName, rs.Attributes)
 	}
 
 	return nil

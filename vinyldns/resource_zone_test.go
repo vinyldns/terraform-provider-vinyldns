@@ -15,10 +15,11 @@ package vinyldns
 import (
 	"fmt"
 	"log"
+	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -30,14 +31,6 @@ const (
 	zConKey           = "nzisn+4G2ldMn0q1CV3vsg=="
 	zConKeyName       = "vinyldns."
 	zConPrimaryServer = "localhost:19001"
-	// NOTE: If ever the test config HCL is changed, these zACLRule*Hash var
-	// values will change as well, as TypeSets are stored in state with an
-	// index value calculated by the hash of the attributes of the set.
-	// https://www.terraform.io/docs/extend/schemas/schema-types.html
-	zACLRuleHash                   = "4011566075"
-	zACLRuleUpdatedHash            = "4195916832"
-	zACLRuleRecordTypesHash        = "1750616469"
-	zACLRuleRecordTypesUpdatedHash = "430998943"
 )
 
 func TestAccVinylDNSZoneBasic(t *testing.T) {
@@ -84,9 +77,11 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", zEmail, "TXT"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmail),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.access_level", zACLRuleHash), "Delete"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.user_id", zACLRuleHash), "ok"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.record_types.%s", zACLRuleHash, zACLRuleRecordTypesHash), "TXT"),
+					resource.TestCheckTypeSetElemNestedAttrs("vinyldns_zone.test_zone", "acl_rule.*", map[string]string{
+						"access_level":   "Delete",
+						"user_id":        "ok",
+						"record_types.#": "1",
+					}),
 				),
 			},
 			resource.TestStep{
@@ -95,9 +90,11 @@ func TestAccVinylDNSZoneWithACL(t *testing.T) {
 					testAccCheckVinylDNSZoneWithACLExists("vinyldns_zone.test_zone", zEmailUpdated, "A"),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "name", zName),
 					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", "email", zEmailUpdated),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.access_level", zACLRuleUpdatedHash), "Delete"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.user_id", zACLRuleUpdatedHash), "ok"),
-					resource.TestCheckResourceAttr("vinyldns_zone.test_zone", fmt.Sprintf("acl_rule.%s.record_types.%s", zACLRuleUpdatedHash, zACLRuleRecordTypesUpdatedHash), "A"),
+					resource.TestCheckTypeSetElemNestedAttrs("vinyldns_zone.test_zone", "acl_rule.*", map[string]string{
+						"access_level":   "Delete",
+						"user_id":        "ok",
+						"record_types.#": "1",
+					}),
 				),
 			},
 			resource.TestStep{
@@ -271,14 +268,40 @@ func testAccVinylDNSZoneWithACLImportStateCheck(s []*terraform.InstanceState) er
 		return fmt.Errorf("expected admin_group_id attribute to have value")
 	}
 
-	accessLev := rs.Attributes[fmt.Sprintf("acl_rule.%s.access_level", zACLRuleUpdatedHash)]
-	if accessLev != "Delete" {
-		return fmt.Errorf("expected acl_rule access_level attribute to be 'Delete'; got %s from state: %s", accessLev, rs.Attributes)
+	// Find an ACL rule with access_level=Delete, user_id=ok, record_types=[A]
+	found := false
+	for k, v := range rs.Attributes {
+		if !strings.HasPrefix(k, "acl_rule.") || !strings.HasSuffix(k, ".access_level") {
+			continue
+		}
+
+		// Extract the dynamic index between "acl_rule." and ".access_level"
+		idx := strings.TrimPrefix(strings.TrimSuffix(k, ".access_level"), "acl_rule.")
+
+		if v != "Delete" {
+			continue
+		}
+
+		userID := rs.Attributes[fmt.Sprintf("acl_rule.%s.user_id", idx)]
+		recordTypesCount := rs.Attributes[fmt.Sprintf("acl_rule.%s.record_types.#", idx)]
+
+		recordTypeFound := false
+		prefix := fmt.Sprintf("acl_rule.%s.record_types.", idx)
+		for rk, rv := range rs.Attributes {
+			if strings.HasPrefix(rk, prefix) && rk != prefix+"#" && rv == "A" {
+				recordTypeFound = true
+				break
+			}
+		}
+
+		if userID == "ok" && recordTypesCount == "1" && recordTypeFound {
+			found = true
+			break
+		}
 	}
 
-	recTypes := rs.Attributes[fmt.Sprintf("acl_rule.%s.record_types.%s", zACLRuleUpdatedHash, zACLRuleRecordTypesUpdatedHash)]
-	if recTypes != "A" {
-		return fmt.Errorf("expected acl_rule record_types attribute to be 'A'; got %s from state: %s", recTypes, rs.Attributes)
+	if !found {
+		return fmt.Errorf("expected acl_rule with access_level=Delete, user_id=ok, record_types=[A]; got: %#v", rs.Attributes)
 	}
 
 	return nil
