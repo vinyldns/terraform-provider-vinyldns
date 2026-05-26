@@ -13,6 +13,7 @@ limitations under the License.
 package vinyldns
 
 import (
+	"os"
 	"testing"
 )
 
@@ -51,4 +52,20 @@ func Test_removeBrackets(t *testing.T) {
 	if r != "123" {
 		t.Fatalf("expected removeBrackets to remove '[]' from a string; got %s", r)
 	}
+}
+
+func testPrimaryServer() string {
+	if v := os.Getenv("VINYLDNS_TEST_PRIMARY_SERVER"); v != "" {
+		return v
+	}
+
+	return "localhost:19001"
+}
+
+func testZoneName() string {
+	if v := os.Getenv("VINYLDNS_TEST_ZONE_NAME"); v != "" {
+		return v
+	}
+
+	return "ok."
 }

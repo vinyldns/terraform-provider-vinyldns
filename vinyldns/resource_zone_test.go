@@ -30,8 +30,9 @@ const (
 	zConName          = "vinyldns."
 	zConKey           = "nzisn+4G2ldMn0q1CV3vsg=="
 	zConKeyName       = "vinyldns."
-	zConPrimaryServer = "localhost:19001"
 )
+
+var zConPrimaryServer = testPrimaryServer()
 
 func TestAccVinylDNSZoneBasic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
