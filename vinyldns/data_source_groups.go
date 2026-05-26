@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/vinyldns/go-vinyldns/vinyldns"
 )
 
@@ -84,8 +84,8 @@ func dataSourceVinylDNSGroupsRead(d *schema.ResourceData, meta interface{}) erro
 			"name":        group.Name,
 			"email":       group.Email,
 			"description": group.Description,
-			"member_ids":  memberIDs,
-			"admin_ids":   adminIDs,
+			"member_ids":  schema.NewSet(schema.HashString, memberIDs),
+			"admin_ids":   schema.NewSet(schema.HashString, adminIDs),
 		})
 	}
 

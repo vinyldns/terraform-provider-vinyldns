@@ -1,59 +1,23 @@
-# vinyldns_group (Data Source)
+# vinyldns_group
 
-Use this data source to look up an existing VinylDNS group by name.
+Use this data source to retrieve group details by name.
 
 ## Example Usage
 
-### Look Up a Group
-
 ```hcl
-data "vinyldns_group" "dns_admins" {
-  name = "dns-admins"
+data "vinyldns_group" "admins" {
+  name = "my-admins"
 }
 ```
 
-### Create a Zone with an Existing Group
+## Arguments Reference
 
-```hcl
-data "vinyldns_group" "existing" {
-  name = "existing-admin-group"
-}
+* `name` - (Required) The name of the group.
 
-resource "vinyldns_zone" "example" {
-  name           = "example.com."
-  email          = "hostmaster@example.com"
-  admin_group_id = data.vinyldns_group.existing.id
-}
-```
+## Attributes Reference
 
-### Output Group Details
-
-```hcl
-data "vinyldns_group" "example" {
-  name = "my-group"
-}
-
-output "group_info" {
-  value = {
-    id           = data.vinyldns_group.example.id
-    email        = data.vinyldns_group.example.email
-    member_count = length(data.vinyldns_group.example.member_ids)
-  }
-}
-```
-
-## Argument Reference
-
-* `name` - (Required) The exact name of the group to look up.
-
-## Attribute Reference
-
-* `id` - The unique identifier of the group.
-
-* `email` - The email address associated with the group.
-
-* `description` - The description of the group.
-
-* `member_ids` - A set of user IDs who are members of the group.
-
-* `admin_ids` - A set of user IDs who are administrators of the group.
+* `id` - The ID of the group.
+* `email` - The email associated with the group.
+* `description` - The group description.
+* `member_ids` - The member user IDs.
+* `admin_ids` - The admin user IDs.

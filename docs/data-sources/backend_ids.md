@@ -1,33 +1,13 @@
-# vinyldns_backend_ids (Data Source)
+# vinyldns_backend_ids
 
-Use this data source to list the available DNS backend IDs known to VinylDNS. These IDs identify DNS backends that zones can reference; this provider does not manage backends themselves.
+Use this data source to retrieve the list of configured backend IDs.
 
 ## Example Usage
 
-### List Available Backends
-
 ```hcl
-data "vinyldns_backend_ids" "available" {}
-
-output "available_backends" {
-  value = data.vinyldns_backend_ids.available.backend_ids
-}
+data "vinyldns_backend_ids" "all" {}
 ```
 
-### Check for a Specific Backend
+## Attributes Reference
 
-```hcl
-data "vinyldns_backend_ids" "available" {}
-
-output "has_default_backend" {
-  value = contains(data.vinyldns_backend_ids.available.backend_ids, "default")
-}
-```
-
-## Argument Reference
-
-This data source has no arguments.
-
-## Attribute Reference
-
-* `backend_ids` - A list of backend ID strings representing the DNS backends known to VinylDNS (backends are managed outside Terraform).
+* `backend_ids` - List of backend IDs.
